@@ -1,2 +1,3 @@
 name: Cristian E. Nuno
 markdown: kramdown
+permalink: /blog/:year/:month/:day/:title

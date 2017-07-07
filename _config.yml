@@ -1,5 +1,4 @@
 name: Cristian E. Nuno
-markdown: kramdown
-permalink: /blog/:year/:month/:day/:title
-
+title: Welcome to Cristian E. Nuno's website!
 theme: jekyll-theme-cayman
+description: Feel free to boomark this page to keep an eye on my project updates.

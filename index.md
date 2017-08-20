@@ -1,6 +1,29 @@
-## Cristian E. Nuno
+# Cristian E. Nuno
 
 My name is Cristian E. Nuno. One year ago I never knew about GitHub. I thought R was a sound pirates made; I thought Python was a type of snake. Looking back, I never knew how all three would advance my passion for urban policy.
+
+*****************
+
+## Mapping the CTA (August 2017)
+
+[![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/MapCTA.png)](https://rpubs.com/cenuno/Mapping_CTA)
+
+[Tutorial](https://rpubs.com/cenuno/Mapping_CTA) on how to plot the Chicago Transportation Authority (CTA) 'L' Rail Line, Rail Stations, Bus Routes, and Bus Stops for the City of Chicago.
+******************
+
+## Point-n-Polygon (August 2017)
+
+[![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/PointNPolygon.png)](https://rpubs.com/cenuno/spatial_analysis_pts_poly)
+
+What follows is a [tutorial](https://rpubs.com/cenuno/spatial_analysis_pts_poly) on the key spatial elements needed to understand how to identify points which reside in specific polygons.
+*******************
+
+## Querying USAspending API data from RStudio (June 2017)
+
+[![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/QueryUSA.png)](https://rpubs.com/cenuno/USAspendingAPI)
+
+[USAspending API](https://api.usaspending.gov/) offers an interactive way for active citizens to query relevant federal spending data on a variety of fields. People can query data by geography, type of federal spending, CFDA program number, and much more. [Click here a tutorial](https://rpubs.com/cenuno/USAspendingAPI) on querying the data for FY17 Austin, Texas.
+
 
 ## My Journey
 

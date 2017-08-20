@@ -4,6 +4,14 @@ My name is Cristian E. Nuno. One year ago I never knew about GitHub. I thought R
 
 *****************
 
+## Catalog of Federal Domestic Assistance (CFDA) Search Tool (August 2017)
+
+[![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/CFDA.png)](http://rpubs.com/cenuno/cfda_search)
+
+A [search-engine](http://rpubs.com/cenuno/cfda_search) was created to help users browse the CFDA by typing in keywords. Click here for the [source code](https://github.com/cenuno/Spatial_Visualizations/blob/master/USAspending/cfda_extraction_datatable.r).
+
+***********
+
 ## Mapping the CTA (August 2017)
 
 [![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/MapCTA.png)](https://rpubs.com/cenuno/Mapping_CTA)
@@ -23,7 +31,6 @@ What follows is a [tutorial](https://rpubs.com/cenuno/spatial_analysis_pts_poly)
 [![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/QueryUSA.png)](https://rpubs.com/cenuno/USAspendingAPI)
 
 [USAspending API](https://api.usaspending.gov/) offers an interactive way for active citizens to query relevant federal spending data on a variety of fields. People can query data by geography, type of federal spending, CFDA program number, and much more. [Click here a tutorial](https://rpubs.com/cenuno/USAspendingAPI) on querying the data for FY17 Austin, Texas.
-
 
 ## My Journey
 

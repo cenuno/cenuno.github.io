@@ -1,5 +1,3 @@
-# cenuno.github.io
+# Urban Data Science
 
-## The Idea is Simple: Create an Urban Data Science Website
-
-Follow me on my quest to create a [free website](https://cenuno.github.io/) using GitHub!
+[Urban Data Science](https://cenuno.github.io/) showcases my latest efforts to combine my public policy background and my emerging data scientist background. The idea is that people can and should combine these two fields to make the world a better place.

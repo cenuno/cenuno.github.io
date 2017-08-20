@@ -32,6 +32,8 @@ What follows is a [tutorial](https://rpubs.com/cenuno/spatial_analysis_pts_poly)
 
 [USAspending API](https://api.usaspending.gov/) offers an interactive way for active citizens to query relevant federal spending data on a variety of fields. People can query data by geography, type of federal spending, CFDA program number, and much more. [Click here a tutorial](https://rpubs.com/cenuno/USAspendingAPI) on querying the data for FY17 Austin, Texas.
 
+*****************
+
 ## My Journey
 
 I want to be an urban data scientist. I understand that this title is a [neologism](http://www.dictionary.com/browse/neologism); however, I firmly believe the future will require all social scientists, policy makers, and business people to harness the power of technology to showcase their research, policy recommendations, and business decisions.

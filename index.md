@@ -4,7 +4,7 @@ My name is Cristian E. Nuno. One year ago I never knew about GitHub. I thought R
 
 *****************
 
-# CPS Locator
+# CPS Locator (August 2017)
 
 [![](https://github.com/cenuno/shiny/raw/master/Images/Screen%20Shot%202017-08-27%20at%203.50.54%20AM.png)](https://cenuno.shinyapps.io/cps_locator/)
 
@@ -52,7 +52,7 @@ As of August 27, 2017 deployment, here is what needs to continue to be done:
 
 Thank you everyone for your feedback and encouragement on this project!
 
-#Last updated on August 27, 2017*
+*Last updated on August 27, 2017*
 
 *****************
 

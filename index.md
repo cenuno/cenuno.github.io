@@ -66,7 +66,7 @@ A [search-engine](http://rpubs.com/cenuno/cfda_search) was created to help users
 
 ## Mapping the CTA (August 2017)
 
-[![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/MapCTA.png)](https://rpubs.com/cenuno/Mapping_CTA)
+[![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/CTA_L_RailLines_Stations_2017-08-19.png)](https://rpubs.com/cenuno/Mapping_CTA)
 
 [Tutorial](https://rpubs.com/cenuno/Mapping_CTA) on how to plot the Chicago Transportation Authority (CTA) 'L' Rail Line, Rail Stations, Bus Routes, and Bus Stops for the City of Chicago.
 

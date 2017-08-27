@@ -1,4 +1,4 @@
-# Urban Data Science
+# Home
 
 Welcome to Urban Data Science:  Using Open-Source Tools to Study Urban Life.
 
@@ -13,7 +13,7 @@ This quote inspires me to continue to improve my work. Only way to do that is to
 
 *****************
 
-# CPS Locator (August 2017)
+## CPS Locator (August 2017)
 
 [![](https://github.com/cenuno/shiny/raw/master/Images/Screen%20Shot%202017-08-27%20at%203.50.54%20AM.png)](https://cenuno.shinyapps.io/cps_locator/)
 

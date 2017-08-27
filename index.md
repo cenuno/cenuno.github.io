@@ -21,7 +21,7 @@ This quote inspires me to continue to improve my work. Only way to do that is to
 
 The goal is simple: to make finding a CPS school of interest easier using open-source tools. 
 
-## Run App from RStudio/R Console
+### Run App from RStudio/R Console
 
 Copy and paste the following R commands to run the app locally on your machine:
 
@@ -46,7 +46,7 @@ shiny::runUrl( url = "https://github.com/cenuno/shiny/archive/master.zip"
                 )
 ```
 
-## Next Steps
+### Next Steps
 
 As of August 27, 2017 deployment, here is what needs to continue to be done:
 

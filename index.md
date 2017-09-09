@@ -15,6 +15,14 @@ This quote inspires me to continuosly improve my analytical skills. I hope it in
 
 *****************
 
+## CPS Locator Update (September 2017)
+
+Hi everyone. First off, thank you to my old professor and colleague for their advice on the CPS Locator App. Their feedback has pushed me to slow down on the development, and instead spend more time on the user-experience of the app.
+
+In the meantime, please [check out my progress for CPS Locator Version 3.0](https://github.com/cenuno/shiny/projects/1). I'm taking advantage of [GitHub's Project Board tool](https://help.github.com/articles/about-project-boards/).
+
+There's a lot of work that remains! Enjoy your weekend.
+
 ## CPS Locator (September 2017)
 
 ### CPS Locator: making it easier to find the right Chicago Public School for you.

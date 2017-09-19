@@ -119,9 +119,9 @@ A [search-engine](http://rpubs.com/cenuno/cfda_search) was created to help users
 
 ## Point-n-Polygon (August 2017)
 
-[![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/PointNPolygon.png)](https://rpubs.com/cenuno/spatial_analysis_pts_poly)
+[![](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/PointNPolygon.png)](http://rpubs.com/cenuno/ID_Points-in-Polygons)
 
-What follows is a [tutorial](https://rpubs.com/cenuno/spatial_analysis_pts_poly) on the key spatial elements needed to understand how to identify points which reside in specific polygons.
+What follows is a [tutorial](http://rpubs.com/cenuno/ID_Points-in-Polygons) on the key spatial elements needed to understand how to identify points which reside in specific polygons.
 
 *******************
 

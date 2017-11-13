@@ -15,6 +15,46 @@ This quote inspires me to continuosly improve my analytical skills. I hope it in
 
 *****************
 
+## Rendering UI Based on User Input (November 2017)
+
+Hi everyone,
+
+Apps should be built around the user experience. Rather than overwhelming users within multiple filters in the beginning, it is important to establish a hierarchy of filters. By establishing this order, a user gets to other filters based on previous filters. 
+
+[![Chicago Deep Dish](https://github.com/cenuno/shiny/raw/master/Images/Screen%20Shot%202017-11-12%20at%208.45.36%20PM.png)](https://github.com/cenuno/shiny/tree/master/Interactive_UI#run-app-yourself)
+
+### Run App Yourself
+
+For a hands on tutorial, please [click here](https://github.com/cenuno/shiny/tree/master/Interactive_UI) or run the following lines of code:
+
+```R
+# install necessary packages
+install.packages( c( "shiny"              # Web Application Framework for R
+                     , "shinydashboard"   # Create Dashboards with 'Shiny'
+                     , "leaflet"          # Create Interactive Web Maps with the JavaScript 'Leaflet' Library
+                     , "htmltools"        # Tools for HTML
+                     , "htmlwidgets"      # HTML Widgets for R
+                     , "dplyr"            # A Grammar of Data Manipulation
+                     , "magrittr"         # Ceci n'est pas une pipe
+                     , "DT"               # A Wrapper of the JavaScript Library 'DataTables'
+                     , "magrittr"          # Interactive Viewing of Spatial Data in R
+                     )
+                     )
+# load necessary packages
+library( shiny )
+
+# call Shiny app from GitHub
+shiny::runUrl( url = "https://github.com/cenuno/shiny/archive/master.zip"
+                 , subdir = "Interactive_UI"
+               )
+
+## end of script ##
+```
+
+Hope everyone's enjoying November!
+
+*****************
+
 ## CPS Locator Update (September 2017)
 
 Hi everyone. First off, thank you to my old professor and colleague for their advice on the CPS Locator App. Their feedback has pushed me to slow down on the development, and instead spend more time on the user-experience of the app.

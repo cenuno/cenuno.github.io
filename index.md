@@ -37,7 +37,7 @@ install.packages( c( "shiny"              # Web Application Framework for R
                      , "dplyr"            # A Grammar of Data Manipulation
                      , "magrittr"         # Ceci n'est pas une pipe
                      , "DT"               # A Wrapper of the JavaScript Library 'DataTables'
-                     , "magrittr"          # Interactive Viewing of Spatial Data in R
+                     , "mapview"          # Interactive Viewing of Spatial Data in R
                      )
                      )
 # load necessary packages

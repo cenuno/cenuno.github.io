@@ -45,7 +45,7 @@ library( shiny )
 
 # call Shiny app from GitHub
 shiny::runUrl( url = "https://github.com/cenuno/shiny/archive/master.zip"
-                 , subdir = "Interactive_UI"
+                 , subdir = "Interactive_UI/Dynamic_Pizza/app.R"
                )
 
 ## end of script ##

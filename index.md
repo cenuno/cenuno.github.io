@@ -12,6 +12,28 @@ For those of you who are new to coding in either language, welcome! I share with
 
 This quote inspires me to continuosly improve my analytical skills. I hope it inspires you to do the same, regardless if you're a beginner or an experienced developer.
 
+*****************
+
+## Highlighting Coordinate Pairs within a Specified Distance (December 2017)
+
+[![Screenshot of Rpubs post](https://github.com/cenuno/Spatial_Visualizations/raw/master/Images/distance_coord_pairs.png)](http://rpubs.com/cenuno/distance_coordinate_pairs)
+
+Hi everyone,
+
+Despite what [Kyrie Irving](http://ftw.usatoday.com/2017/11/kyrie-irving-earth-flat-theory-no-real-picture-podcast-geno-auriemma-celtics-nba) - 2016 NBA Champion - and [other flat-earthers](https://www.washingtonpost.com/news/speaking-of-science/wp/2017/11/27/a-flat-earthers-plan-to-launch-himself-in-a-homemade-rocket-has-been-postponed-again/?utm_term=.3ea5e8dfbf6d) might say, [Bill Walton](https://twitter.com/cjzero/status/944054912580837376) - 1977 & 1986 NBA Champion - and [NASA](https://www.nasa.gov/) are here to help set the record straight. 
+
+Calculating the shortest distance between two points on Earth **needs to take into the curvature** of the Earth. 
+
+This tutorials covers the following:
+
+* calculating the shortest distance between two points
+* drawing a user-defined radius around a particular coordinate pair (more on this below)
+* highlighting those coordinate pairs within the radius a different color than the rest
+
+Thanks to [Gregoire Vincke's](https://stackoverflow.com/users/2409460/gregoire-vincke) answer to the Stack Overflow question [*Drawing a Circle with a Radius of a Defined Distance in a Map*](https://stackoverflow.com/questions/23071026/drawing-a-circle-with-a-radius-of-a-defined-distance-in-a-map), there is a way to graphically plot a user-specified circle. Thank you, Gregoire for contributing to the open-source community!
+
+
+
 
 *****************
 

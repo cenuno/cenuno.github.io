@@ -4,7 +4,7 @@ navbar:
   title: "Urban Data Science"
   left:
     - text: "Home"
-      href: home.html
+      href: index.html
 output:
   html_document: 
     theme: readable

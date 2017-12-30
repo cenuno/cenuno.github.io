@@ -1,4 +1,5 @@
 name: "Urban Data Science"
+output_dir: "."
 navbar:
   title: "Urban Data Science"
   left:
@@ -11,4 +12,3 @@ output:
     toc_float: TRUE
     code_folding: hide
     fig_caption: TRUE
-output_dir: "."

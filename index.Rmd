@@ -1,6 +1,24 @@
 ---
 title: "Home"
 ---
+<base target="_top"/>
 
-Hope this works.
+<center>![](http://www.picserver.org/images/highway/phrases/under-construction.jpg)</center>
 
+## Under Construction
+
+*December 29, 2017*
+
+Urban Data Science is currently being redesigned. In the meantime, please see the following links to get in touch with me:
+
+* [RPubs blog posts showcasing my latest R tutorials](https://rpubs.com/cenuno).
+
+* [Stack Overflow](https://stackoverflow.com/users/7954106/aspiringurbandatascientist).
+
+* Connect on [LinkedIn](https://www.linkedin.com/in/cristiannuno)
+
+* Email me at cenuno AT uchicago DOT edu
+
+Thank you for your continued support as I create tutorials for folks to learn how to use R to conduct analysis.
+
+*******

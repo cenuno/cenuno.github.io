@@ -1,0 +1,14 @@
+name: "Urban Data Science"
+navbar:
+  title: "Urban Data Science"
+  left:
+    - text: "Home"
+      href: index.html
+output:
+  html_document: 
+    theme: readable
+    toc: TRUE
+    toc_float: TRUE
+    code_folding: hide
+    fig_caption: TRUE
+output_dir: "."

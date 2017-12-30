@@ -13,11 +13,11 @@ Urban Data Science is currently being redesigned. In the meantime, please see th
 
 * [RPubs blog posts showcasing my latest R tutorials](https://rpubs.com/cenuno).
 
-* [Stack Overflow](https://stackoverflow.com/users/7954106/aspiringurbandatascientist).
+* [My Stack Overflow profile](https://stackoverflow.com/users/7954106/aspiringurbandatascientist).
 
-* Connect on [LinkedIn](https://www.linkedin.com/in/cristiannuno)
+* Connect on [LinkedIn](https://www.linkedin.com/in/cristiannuno).
 
-* Email me at cenuno AT uchicago DOT edu
+* Email me at cenuno AT uchicago DOT edu.
 
 Thank you for your continued support as I create tutorials for folks to learn how to use R to conduct analysis.
 

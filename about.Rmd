@@ -1,0 +1,55 @@
+---
+output:
+  html_document: 
+    theme: readable
+    toc: TRUE
+    toc_float: TRUE
+    code_folding: hide
+    fig_caption: TRUE
+---
+<base target="_top"/>
+
+# Inspiration
+
+One year ago, I thought [GitHub](https://github.com/) was a train station. I thought [R](https://www.r-project.org/about.html) was a sound pirates made; I thought [Python](https://www.python.org/about/gettingstarted/) was a type of snake. 
+
+I share with you a quote by *[This American Life](https://www.thisamericanlife.org/about)*'s [Ira Glass](https://www.goodreads.com/quotes/309485-nobody-tells-this-to-people-who-are-beginners-i-wish):
+
+> <p style="font-size:16px">**Nobody tells this to people who are beginners, I wish someone told me**. All of us who do creative work, we get into it because we have good taste. But there is this gap. **For the first couple years you make stuff, it’s just not that good.** It’s trying to be good, it has potential, but it’s not. But your taste, the thing that got you into the game, is still killer. And your taste is why your work disappoints you. **A lot of people never get past this phase, they quit.** Most people I know who do interesting, creative work went through years of this. We know our work doesn’t have this special thing that we want it to have. We all go through this. **And if you are just starting out or you are still in this phase, you gotta know its normal and the most important thing you can do is do a lot of work.** Put yourself on a deadline so that every week you will finish one story. **It is only by going through a volume of work that you will close that gap, and your work will be as good as your ambitions**. And I took longer to figure out how to do this than anyone I’ve ever met. **It’s gonna take awhile. It’s normal to take awhile. You’ve just gotta fight your way through**.</p>
+
+This quote inspires me to continuosly improve my analytical skills. I hope it inspires you to do the same, regardless if you're a beginner or an experienced programmer.
+
+# Background
+
+## College
+
+I studied urban planning and economics at the [University of Illinois at Chicago](https://www.honors.uic.edu/) (UIC). While economics taught me how certain things influence market actions, it was urban planning that engrained in me the value of looking at things at the individual level.
+
+The emphasis on the individual was eloquently expressed through the writings of [Mike Royko](http://www.press.uchicago.edu/Misc/Chicago/730719.html) and [Studs Terkel](https://www.youtube.com/watch?v=Oyl1BvHo9LM). I learned of great Chicago leaders such as [Jane Addams](http://www.hullhousemuseum.org/), [Harold Washington](https://www.thisamericanlife.org/radio-archives/episode/84/harold), and [Florence Scala](http://www.encyclopedia.chicagohistory.org/pages/410114.html).
+
+Despite my qualitative background, I decided to go onto to graduate school to strengthen my technical skills. 
+
+## Graduate School
+
+During my time as a Master of Public Administration (MPA) student Syracuse University's [Maxwell School of Citizenship and Public Affairs](https://www.maxwell.syr.edu/paia/), I took a [*Data Driven Management*](http://www.lecy.info/data-driven-management) course. Here, [Professor Jesse Lecy](http://www.lecy.info/) exposed me to the power of open-source software. 
+
+The programming language [R](https://www.r-project.org/about.html) and the code hosting platform [GitHub](https://guides.github.com/activities/hello-world/) enable users from around the world to build, update, and revise tools in real time. 
+
+No longer would policy decisions be hidden in an appendix behind some report; now, anyone with a computer could extract the exact code used to reach those same conclusions. 
+
+In the summer of 2017, I finished my time at Syracuse with both a MPA degree and Certificate in Advanced Study in Data Science.
+
+## Professional Experience
+
+Since the summer of 2017, I currently work as a [Project Associate](https://urbanlabs.uchicago.edu/people/cristian-nuno) for the Poverty Lab, one of the five Labs established within the [University of Chicago's Urban Labs](https://urbanlabs.uchicago.edu/about).
+
+As one of the smaller labs, my position allows me to take on a wide-range of responsibilites. A few them are as follows:
+
+* Identify equivalent individuals, using both deterministic and probabilistic record linkage methods, in administrative datasets using R. 
+* Visualize descriptive statistics, not limited to but including choropleth maps, small multiple plots, and grouped bar charts, using R.
+* Train two undergraduate interns to use version control on their joint interactive visualization project, using the Shiny and Leaflet R packages.
+* Train qualitatively-strong coworkers to use R, RStudio, and RMarkdown to both produce internal reports and export crosstabs as CSV files.
+
+
+
+

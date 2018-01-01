@@ -1,24 +1,10 @@
----
-title: "Home"
----
+
 <base target="_top"/>
 
-<center>![](http://www.picserver.org/images/highway/phrases/under-construction.jpg)</center>
+# Welcome
 
-## Under Construction
+My name is Cristian E. Nuno and I believe that sharing knowledge is one way to make the world a better place.
 
-*December 29, 2017*
+*Urban Data Science* showcases my latest efforts to combine my public policy and data analytics background into open-source tutorials.
 
-Urban Data Science is currently being redesigned. In the meantime, please see the following links to get in touch with me:
-
-* [RPubs blog posts showcasing my latest R tutorials](https://rpubs.com/cenuno).
-
-* [My Stack Overflow profile](https://stackoverflow.com/users/7954106/aspiringurbandatascientist).
-
-* Connect on [LinkedIn](https://www.linkedin.com/in/cristiannuno).
-
-* Email me at cenuno AT uchicago DOT edu.
-
-Thank you for your continued support as I create tutorials for folks to learn how to use R to conduct analysis.
-
-*******
+By lifting the black box and exposing both the excitment and limitations of data analysis, I wish to inpsire folks with less technical backgrounds to jump into the field of data analytics. The world needs you - so start learning today!

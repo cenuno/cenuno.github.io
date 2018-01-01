@@ -1,14 +1,39 @@
-name: "Urban Data Science"
-output_dir: "."
+name: Urban Data Science
+output_dir: '.'
 navbar:
-  title: "Urban Data Science"
+  title: Urban Data Science
+  type: default
   left:
-    - text: "Home"
-      href: index.html
+  - text: Tutorials
+    icon: fa-file-code-o fa-lg
+    menu:
+    - text: R
+    - text: Label Points Inside Polygons
+      href: Label_Points_inside_Polygons.html
+    - text: Make a Choropleth Map
+      href: choropleth_map.html
+    - text: Highlight Points Inside a Certain Radius
+      href: distance_coord_pairs.html
+  - text: About
+    icon: fa-info fa-lg
+    href: about.html
+  - text: Disclaimer
+    icon: fa-file-text fa-lg
+    href: disclaimer.html
+  right:
+  - icon: fa-github fa-lg
+    href: https://github.com/cenuno
+  - icon: fa-stack-overflow fa-lg
+    href: https://stackoverflow.com/users/7954106/aspiringurbandatascientist
+  - icon: fa-linkedin fa-lg
+    href: https://www.linkedin.com/in/cristiannuno
+  - icon: fa-envelope fa-lg
+    href: mailto:nuno.e.cristian@gmail.com
 output:
-  html_document: 
+  html_document:
     theme: readable
-    toc: TRUE
-    toc_float: TRUE
-    code_folding: hide
-    fig_caption: TRUE
+    include:
+      after_body: footer.html
+    lib_dir: site_libs
+    self_contained: no
+

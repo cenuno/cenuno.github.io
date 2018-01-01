@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Cristian Nuno" />
+
+<meta name="date" content="2017-12-25" />
+
+<title>Label Points Inside Polygons</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 66px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+
+.section h2 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+.section h3 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+.section h4 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+.section h5 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+.section h6 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Urban Data Science</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-file-code-o fa-lg"></span>
+     
+    Tutorials
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">R</li>
+    <li>
+      <a href="Label_Points_inside_Polygons.html">Label Points Inside Polygons</a>
+    </li>
+    <li>
+      <a href="choropleth_map.html">Make a Choropleth Map</a>
+    </li>
+    <li>
+      <a href="distance_coord_pairs.html">Highlight Points Inside a Certain Radius</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="about.html">
+    <span class="fa fa-info fa-lg"></span>
+     
+    About
+  </a>
+</li>
+<li>
+  <a href="disclaimer.html">
+    <span class="fa fa-file-text fa-lg"></span>
+     
+    Disclaimer
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/cenuno">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://stackoverflow.com/users/7954106/aspiringurbandatascientist">
+    <span class="fa fa-stack-overflow fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://www.linkedin.com/in/cristiannuno">
+    <span class="fa fa-linkedin fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="mailto:nuno.e.cristian@gmail.com">
+    <span class="fa fa-envelope fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Label Points Inside Polygons</h1>
+<h4 class="author"><em>Cristian Nuno</em></h4>
+<h4 class="date"><em>December 25, 2017</em></h4>
+
+</div>
+
+
+<p><base target="_top"/></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Working with spatial elements is what got me interested in learning <a href="https://www.r-project.org/about.html">R</a> in the first place. But I must admit, it was very overwhelming at first.</p>
+<p>What follows is a walkthrough that goes over the <a href="http://www.nickeubank.com/wp-content/uploads/2015/10/RGIS1_SpatialDataTypes_part1_vectorData.html">key spatial elements</a> needed to understand how to conduct an introductory-level of spatial analysis in R.</p>
+<ul>
+<li>Polygons</li>
+<li>Points</li>
+<li>Identifying Points Inside Polygons</li>
+</ul>
+<div id="necessary-packages" class="section level2">
+<h2>Necessary Packages</h2>
+<p>To follow the tutorial, you’ll need to install the following packages installed:</p>
+<ul>
+<li><p><a href="https://cran.r-project.org/web/packages/sp/index.html"><code>sp</code></a>: classes and methods for spatial data.</p></li>
+<li><p><a href="https://cran.r-project.org/web/packages/rgdal/index.html"><code>rgdal</code></a>: bindings for the <a href="http://www.gdal.org/">Geospatial Data Abstraction Library</a>.</p></li>
+<li><p><a href="https://cran.r-project.org/web/packages/splancs/index.html"><code>splancs</code></a>: spatial and space-time point pattern analysis.</p></li>
+<li><p><a href="https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html"><code>dplyr</code></a>: data manipulation.</p></li>
+<li><p><a href="http://magrittr.tidyverse.org/"><code>magrittr</code></a>: set of operators which make your code more readable.</p></li>
+<li><p><a href="http://rapporter.github.io/pander/"><code>pander</code></a>: provide a minimal and easy tool for rendering R objects into <a href="http://pandoc.org/">Pandoc’s</a> markdown.</p></li>
+</ul>
+<pre class="r"><code>install.packages( c( &quot;sp&quot;, &quot;rgdal&quot;, &quot;splancs&quot;
+                     , &quot;dplyr&quot;, &quot;magrittr&quot;, &quot;pander&quot;
+                     )
+                  )</code></pre>
+</div>
+</div>
+<div id="polygons" class="section level1">
+<h1>Polygons</h1>
+<p>Polygons on a map represent natural or artificial borders used to mark on space apart from another. In Chicago, a common series of polygons are the 77 Community Areas that make up the entire city.</p>
+<center>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg/350px-Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg.png" />
+</center>
+<div id="importing-polygons-into-r" class="section level2">
+<h2>Importing Polygons into R</h2>
+<p>Fortunately, importing polygons into R is easy.</p>
+<p>The data for this tutorial comes from the <a href="https://data.cityofchicago.org/#about">City of Chicago’s Open Data Portal</a>:</p>
+<blockquote>
+<p>City of Chicago’s open data portal is a lets you find city data, find facts about your neighborhood, lets you create maps and graphs about the city, and lets you freely download the data for your own analysis. Many of these data sets are updated at least once a day, and many of them updated several times a day.</p>
+</blockquote>
+<p><a href="https://data.cityofchicago.org/"><img src="https://github.com/cenuno/shiny/raw/master/cps_locator/Images/CityofChicago_DataPortal_HomePage.png" alt="City of Chicago’s Open Data Portal" /></a> <em>Image courtesy of the <a href="https://data.cityofchicago.org/">City of Chicago</a></em></p>
+<p><a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data"><img src="https://github.com/cenuno/shiny/raw/master/cps_locator/Images/Import_CPS_Data_Into_R.png" alt="How to Download .CSV Data from City of Chicago Open Data Portal" /></a> <em>Image courtesy of the <a href="https://data.cityofchicago.org/">City of Chicago</a></em></p>
+<p><a href="https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-current-/cauq-8yn6"><img src="https://github.com/cenuno/shiny/raw/master/cps_locator/Images/Import_CommunityArea_GeoJSON_Into_R.png" alt="How to Download GeoJSON data from City of Chicago Open Data Portal" /></a> <em>Image courtesy of the <a href="https://data.cityofchicago.org/">City of Chicago</a></em></p>
+<p>Boiled down, these are the general steps to importing:</p>
+<ol style="list-style-type: decimal">
+<li><p>Find polygon source, such as <a href="https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-current-/cauq-8yn6">City of Chicago’s current community area (cca) boundaries</a></p></li>
+<li><p>Export that source as a GeoJSON file - a java-based format that condenses the size of geographic information - by copying the link location. With the City’s data portal, go to “Export”, then hover the mouse under “GeoJSON”. Right-click and click on the phrase <a href="https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON">“Copy Link Location”</a>.</p></li>
+<li><p>Save the copied link as a character vector in R</p></li>
+<li><p>Use the <a href="https://cran.r-project.org/web/packages/rgdal/rgdal.pdf"><code>rgdal</code></a> package to call that vector and transform it into a spatial data frame.</p></li>
+<li><p>The same steps apply when importing a <a href="https://en.wikipedia.org/wiki/Comma-separated_values">.CSV</a> file into R, expect substituting <code>rgdal::readOGR()</code> for <code>read.csv()</code>.</p></li>
+</ol>
+<p>See below for what this looks like in R.</p>
+<pre class="r"><code># import necessary packages
+library( sp )
+library( rgdal )
+
+# store Chicago current community area
+# GeoJSON URL as a character vector
+geojson_comarea_url &lt;- &quot;https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON&quot;
+
+# transform URL character vector into spatial dataframe
+comarea606 &lt;- readOGR( dsn = geojson_comarea_url
+                       , layer = &quot;OGRGeoJSON&quot;
+                       , stringsAsFactors = FALSE
+                       , verbose = FALSE # to hide progress message after object is created
+)</code></pre>
+</div>
+</div>
+<div id="points" class="section level1">
+<h1>Points</h1>
+<p>Points on a map represent longitudinal and latitudinal coordinates, a unique pair that specifies an address. <img src="Label_Points_Inside_Polygons_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<div id="when-longitude-and-latitude-are-not-given-you-may-find-them-by-geocoding" class="section level2">
+<h2>When Longitude and Latitude Are Not Given, You May Find Them by Geocoding</h2>
+<p>In the event that coordinate pairs are not given in your data set, see if they have a <code>full_address</code> variable that is composed of street address, city, state, and zip code. If not, see if each of those is its own variable.</p>
+<p>If you possess either a <code>full_address</code> variable or all four variables pasted together compose a full address, you may go onto to geocode the coordinates. This refers to looking up an address in a geo-database and returning the x-y (longitude-latitude) coordinates.</p>
+<p>I often use <a href="https://www.latlong.net/">www.latlong.net</a> if I need geocode one or two addresses. Besides that, I use the <code>geocode</code> function within the <a href="https://cran.r-project.org/web/packages/ggmap/ggmap.pdf"><code>ggmap</code></a> package.</p>
+<p>The <code>geocode</code> function only asks for a full address and - by default - gives you back longitude and latitude pairs.</p>
+</div>
+<div id="chicago-public-school-points" class="section level2">
+<h2>Chicago Public School Points</h2>
+<p>To explore points, we will be using <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a> data from the City’s data portal.</p>
+<p>Using the exact same steps as when we imported polygon data into R is how you will import point data as well.</p>
+<pre class="r"><code># store cps school data for SY1617 URL
+# as a character vector
+cps.sy1617.url &lt;- &quot;https://data.cityofchicago.org/api/views/8i6r-et8s/rows.csv?accessType=DOWNLOAD&quot;
+
+# transform URL into a data frame using the base `read.csv` function
+cps.sy1617 &lt;- read.csv( file = cps.sy1617.url
+                                , header = TRUE
+                                , stringsAsFactors = FALSE
+)</code></pre>
+</div>
+<div id="plotting-points-on-a-polygon" class="section level2">
+<h2>Plotting Points on a Polygon</h2>
+<p>Now that you’ve acquired the two, time to plot!</p>
+<div id="brief-introduction-to-color" class="section level3">
+<h3>Brief Introduction to Color</h3>
+<p>New to colors? Briefly, R’s color arguments - <code>col</code>, <code>bg</code>, <code>border</code> - can take in a variety of colors:</p>
+<ul>
+<li><a href="https://www.w3schools.com/colors/colors_rgb.asp">Red-Green-Blue (RGB)</a></li>
+<li><a href="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf">R colors</a></li>
+<li><a href="http://www.color-hex.com/">Hex color codes</a></li>
+</ul>
+<p>Personal favorite website is <a href="http://htmlcolorcodes.com/">www.htmlcolorcodes.com</a> for their friendly immersion into the world of color.</p>
+<pre class="r"><code># clear margin space
+par( mar = c( 2, 0, 2, 0 )
+     , bg = &quot;#06369D&quot; # cps blue
+     )
+
+# plot the polygons
+plot( comarea606
+      , main = &quot;Chicago Public School (CPS) Locations, 2016-2017 School Year&quot;
+      , col.main = &quot;#F0F3F4&quot;
+      , col = &quot;#06369D&quot; # cps blue
+      , border = &quot;#F0F3F4&quot;
+      ) 
+
+# add the points
+points( x = cps.sy1617$School_Longitude
+        , y = cps.sy1617$School_Latitude
+        , col = rgb( red = 249
+                     , green = 245
+                     , blue = 97
+                     , alpha = 100 # add some transparency
+                     , maxColorValue = 255
+                     ) # bright yellow
+        , pch = 20 # for more information on point type, look at ?par
+          )
+# add legend
+legend( x = &quot;left&quot;
+        , pt.cex = 2
+        , text.col = &quot;#F0F3F4&quot;
+        , legend = &quot;CPS Schools&quot;
+        , pch = 20
+        , col = rgb( red = 249
+                     , green = 245
+                     , blue = 97
+                     , alpha = 100 # add some transparency
+                     , maxColorValue = 255
+                     ) # bright yellow
+        , bty = &quot;n&quot;
+        )
+# add data source
+mtext( side = 1
+       , adj = 0.99
+       , line = 1
+       , cex = 0.75
+       , text = &quot;Source: Chicago Public Schools - School Profile Information SY1617&quot;
+       , col = &quot;#F0F3F4&quot;
+       )</code></pre>
+<p><img src="Label_Points_Inside_Polygons_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Can you identify which points (Chicago Public Schools) reside in which particular polygon (current community area)?</p>
+</div>
+</div>
+</div>
+<div id="identifying-points-inside-polygons" class="section level1">
+<h1>Identifying Points Inside Polygons</h1>
+<p>After reading the <a href="https://stackoverflow.com/questions/17571602/r-filter-coordinates">R Filter Coordinates</a> post on Stack Overflow, I figured out a way to identify points inside polygons. <em>Therefore</em>, you can add the identified polygon as a column for each row, which would allow for the possibility of filtering points based on which polygons they reside in.</p>
+<div id="import-splancs-package" class="section level2">
+<h2>Import ‘splancs’ package</h2>
+<p>Import the <a href="https://cran.r-project.org/web/packages/splancs/splancs.pdf"><code>splancs</code></a> package to conduct our spatial point pattern analysis</p>
+<pre class="r"><code># import necessary packages
+suppressPackageStartupMessages( library( splancs ) )</code></pre>
+</div>
+<div id="create-getpolygoncoordinates-function" class="section level2">
+<h2>Create GetPolygonCoordinates() Function</h2>
+<p>Create <code>GetPolygonCoordinates()</code> function to access coordinate values within multiple polygons inside a spatial data frame.</p>
+<pre class="r"><code>GetPolygonCoordinates &lt;- function( a.spatial.df ) {
+  
+  # start counter
+  i &lt;- 1
+  
+  # create empty list
+  empty.list &lt;- list()
+  
+  # start while loop
+  while( nrow( a.spatial.df ) &gt;= i ) {
+    
+    # fill the empty list with one set of coordinates
+    empty.list[[i]] &lt;- a.spatial.df@polygons[[i]]@Polygons[[1]]@coords
+    
+    # add 1 to the counter
+    i &lt;- i + 1
+    
+  } # end of while loop
+  
+  # return the empty.list to the Global Environment
+  return( empty.list )
+  
+} # end of GetPolygonCoordinates function</code></pre>
+</div>
+<div id="use-getpolygoncoordinates-function" class="section level2">
+<h2>Use GetPolygonCoordinates() Function</h2>
+<p>Use the <code>GetPolygonCoordinates()</code> function to retrieve the coordinate values within the multiple polygons inside the <code>comarea606</code> spatial data frame (which represents the current community areas within the City).</p>
+<pre class="r"><code># use the `GetPolygonCoordinates` function
+# to retrieve all coordinate values that reside 
+# within each polygon
+comarea606.polygons &lt;- GetPolygonCoordinates( comarea606 ) # list of 77 matrices</code></pre>
+</div>
+<div id="use-polygon-names-to-label-77-matrices" class="section level2">
+<h2>Use Polygon Names to Label 77 Matrices</h2>
+<p>Assign the list of names within the spatial data frame to the newly created list of 77 matrices, which contain the coordinate values within the multiple polygons inside the <code>comarea606</code> spatial data frame (which represents the current community areas within the City).</p>
+<p>Since <code>GetPolygonCoordinates()</code> creates each matrix in order of each polygon’s appearance in <code>comarea606</code>, you can safely use the column <code>comarea606$community</code> to label each matrix its corresponding community area name.</p>
+<pre class="r"><code># `comarea606.polygons` is a list with 77 matrices
+# to label each matrix
+# use the `names` functions and assign its corresponding community area name
+# by calling the &quot;community&quot; variable
+# inside the `comarea606` spatial polygon data frame
+names( comarea606.polygons ) &lt;- comarea606$community</code></pre>
+</div>
+<div id="create-a-community_area-placeholder-variable" class="section level2">
+<h2>Create a Community_Area Placeholder Variable</h2>
+<p>Create a <code>Community_Area</code> variable that will be used to store the name of the polygon that points belong to in the spatial data frame.</p>
+<p>For now, assign every row in the <code>Community Area</code> variable with the value <code>NA</code>.</p>
+<p><strong>Should a coordinate pair in your data frame not be in any of the polygons</strong>, the function <code>IdentifyCommunityAreas()</code> will simply skip over that point.</p>
+<pre class="r"><code># import necessary packages
+library( dplyr )
+library( magrittr )
+library( pander )
+
+# Create &#39;Community_Area&#39; variable inside the data frame
+# and assign it a value of NA
+cps.sy1617$Community_Area &lt;- NA
+
+# peak inside the data frame BEFORE the transformation
+cps.sy1617 %&gt;% # call df
+  select( Short_Name
+              , School_Longitude
+              , School_Latitude
+              , Community_Area ) %&gt;% # select certain columns
+  head() %&gt;% # only show first six rows
+  pander( digit = 7
+          , caption = &quot;Sample of Chicago Public Schools - School Profile Information SY1617&quot;
+          ) # prints an R object in Pandoc&#39;s markdown</code></pre>
+<table>
+<caption>Sample of Chicago Public Schools - School Profile Information SY1617</caption>
+<colgroup>
+<col width="24%" />
+<col width="26%" />
+<col width="24%" />
+<col width="24%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Short_Name</th>
+<th align="center">School_Longitude</th>
+<th align="center">School_Latitude</th>
+<th align="center">Community_Area</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">SAYRE</td>
+<td align="center">-87.79872</td>
+<td align="center">41.91415</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">MCNAIR</td>
+<td align="center">-87.74673</td>
+<td align="center">41.89782</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">HOLDEN</td>
+<td align="center">-87.65379</td>
+<td align="center">41.83803</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">ACERO - ZIZUMBO</td>
+<td align="center">-87.7305</td>
+<td align="center">41.81014</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">MURPHY</td>
+<td align="center">-87.71683</td>
+<td align="center">41.95008</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">BATEMAN</td>
+<td align="center">-87.70215</td>
+<td align="center">41.95822</td>
+<td align="center">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="create-identifycommunityareas-function" class="section level2">
+<h2>Create IdentifyCommunityAreas() Function</h2>
+<p>Now to put it all together with a function that takes two R objects:</p>
+<ol style="list-style-type: decimal">
+<li><p>A data frame containing a longitude and latitude point for every row</p></li>
+<li><p>A list of coordinates within every polygon from a spatial drame</p></li>
+</ol>
+<p>and assigns individual points the name of the polygon they reside in.</p>
+<div id="notes" class="section level3">
+<h3>Notes</h3>
+<div id="points-that-may-not-exist-within-any-of-the-polygons" class="section level4">
+<h4>Points that may not exist within any of the polygons</h4>
+<p>The function has been updated to account for data frames which contain some latitude and longitude coordinates that not exist in any polygons. The CPS data frame was a lucky pick in the sense that every polygon contained at least one coordinate pair.</p>
+</div>
+<div id="selecting-points-inside-a-polygon" class="section level4">
+<h4>Selecting points inside a polygon</h4>
+<p>The <code>splancs::inpip()</code> function returns a vector of indices of the points in <code>pts</code> which are located within the polygon in <code>poly</code>. The logical test here is to see which rows within the <code>df.lon.lat</code> data frame are within the vector of indices being returned by <code>splancs::inpip()</code>.</p>
+</div>
+<div id="assuming-a-complete-list-of-non-na-coordinate-pairs" class="section level4">
+<h4>Assuming a complete list of non-NA coordinate pairs</h4>
+<p>At the moment, the following function assumes the data frame contains <code>longitude</code> and <code>latitude</code> pairs which do not contain a single NA value.</p>
+<pre class="r"><code>IdentifyCommunityAreas &lt;- function( a.data.frame
+                                    , a.list.of.coordinates
+                                    ) {
+  # 1. Ensure necessary packages are imported
+  require( splancs )
+  
+  # 2. Create &#39;Community_Area&#39; variable inside the data frame
+  # and assign it a value of NA. This variable will be used to
+  # identify which coordinate pairs exist within which particular
+  # polygons from a.spatial.df
+  a.data.frame$Community_Area &lt;- NA
+  
+  # 3. Start your counter
+  i &lt;- 1
+  
+  # 4. Start your while loop
+  while( length( a.list.of.coordinates ) &gt;= i  ) {
+    
+    # 5. Create a coordinate pair data frame
+    df.lon.lat &lt;- a.data.frame[ c( &quot;School_Longitude&quot;
+                                   , &quot;School_Latitude&quot;
+                                   )
+                                ]
+    
+    # 6. Rename the columns within df.lon.lat
+    
+    # rename &quot;School_Longitude&quot; as &quot;x&quot;
+    colnames( df.lon.lat )[ 
+      which( colnames( df.lon.lat ) == &quot;School_Longitude&quot; ) 
+      ] &lt;- &quot;x&quot;
+    
+    # rename &quot;School_Latitude&quot; as &quot;y&quot;
+    colnames( df.lon.lat )[ 
+      which( colnames( df.lon.lat ) == &quot;School_Latitude&quot; ) 
+      ] &lt;- &quot;y&quot;
+    
+    # 7. Test which coordinate pairs from df.lon.lat
+    #    reside within the ith polygon 
+    #    inside of a.list.of.coordinates
+    
+    df.lon.lat$in.polygon &lt;- 
+      
+      1:nrow( df.lon.lat) %in%
+      inpip(
+        pts = df.lon.lat
+        , poly = a.list.of.coordinates[[i]]
+      ) 
+    
+    # 8. Logical test: Does at least one coordinate pairs reside within
+    #    this particular polygon (i.e. a.list.of.coordinates[[i]])?
+    if( any( df.lon.lat$in.polygon ) == TRUE ) {
+      # since at least one coordinate pair within df.lon.lat
+      # resides within this particular polygon,
+      # filter df.lon.lat to only include these pairs which
+      # contain a TRUE value in their $in.polygon column.
+      df.lon.lat &lt;- 
+        df.lon.lat[ which( df.lon.lat$in.polygon == TRUE ), ]
+      
+      # 9. Two step process:
+      #      * filter a.data.frame by including only those rows
+      #        whose $School_Longitude values appear in df.lon.lat$x
+      #        AND
+      #        whose $School_Latitude values appear in df.lon.lat$y
+      #
+      #      * for these filtered rows, replace their $Community_Area NA values
+      #        with the name of the ith polygon within a.list.of.coordinates
+      a.data.frame[ 
+        which( a.data.frame$School_Longitude %in% df.lon.lat$x &amp;
+                 a.data.frame$School_Latitude %in% df.lon.lat$y
+               ), ]$Community_Area &lt;- names( a.list.of.coordinates )[i]
+      
+      # 10. Move onto the next polygon with a list.of.coordinates
+      i &lt;- i + 1
+      
+    } else{
+      
+      # 11. since every coordinate pair within df.lon.lat
+      # does not reside within this particular polygon,
+      # add one to counter 
+      # and move onto the the next polygon
+      # within a.list.of.coordinates[[i]]
+      i &lt;- i + 1
+
+    } # end of else statement
+    
+  } # end of while loop
+  
+  # 12. return the a.data.frame$Community_Area variable
+  # to the Global Environment
+  return( a.data.frame$Community_Area )
+  
+} # end of IdentifyCommunityAreas() function</code></pre>
+</div>
+</div>
+</div>
+<div id="use-identifycommunityareas-function" class="section level2">
+<h2>Use IdentifyCommunityAreas() Function</h2>
+<p>Run the <code>IdentifyCommunityAreas()</code> function to assign points within the data frame the names of the polygon they reside in. Peak inside to make sure it worked.</p>
+<pre class="r"><code># Run the `IdentifyCommunityAreas()` function
+cps.sy1617$Community_Area &lt;- IdentifyCommunityAreas( a.data.frame = cps.sy1617
+                                      , a.list.of.coordinates = comarea606.polygons
+                            )
+
+# peak inside the data frame AFTER the transformation
+cps.sy1617 %&gt;% # call df
+  select( Short_Name
+          , School_Longitude
+          , School_Latitude
+          , Community_Area ) %&gt;% # select certain variables within the data frame
+  head() %&gt;% # look at first six rows
+  pander( digit = 7
+          , caption = &quot;Sample of Chicago Public Schools - School Profile Information SY1617&quot;)</code></pre>
+<table>
+<caption>Sample of Chicago Public Schools - School Profile Information SY1617</caption>
+<colgroup>
+<col width="24%" />
+<col width="26%" />
+<col width="24%" />
+<col width="24%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Short_Name</th>
+<th align="center">School_Longitude</th>
+<th align="center">School_Latitude</th>
+<th align="center">Community_Area</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">SAYRE</td>
+<td align="center">-87.79872</td>
+<td align="center">41.91415</td>
+<td align="center">AUSTIN</td>
+</tr>
+<tr class="even">
+<td align="center">MCNAIR</td>
+<td align="center">-87.74673</td>
+<td align="center">41.89782</td>
+<td align="center">AUSTIN</td>
+</tr>
+<tr class="odd">
+<td align="center">HOLDEN</td>
+<td align="center">-87.65379</td>
+<td align="center">41.83803</td>
+<td align="center">BRIDGEPORT</td>
+</tr>
+<tr class="even">
+<td align="center">ACERO - ZIZUMBO</td>
+<td align="center">-87.7305</td>
+<td align="center">41.81014</td>
+<td align="center">ARCHER HEIGHTS</td>
+</tr>
+<tr class="odd">
+<td align="center">MURPHY</td>
+<td align="center">-87.71683</td>
+<td align="center">41.95008</td>
+<td align="center">IRVING PARK</td>
+</tr>
+<tr class="even">
+<td align="center">BATEMAN</td>
+<td align="center">-87.70215</td>
+<td align="center">41.95822</td>
+<td align="center">IRVING PARK</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="test-accuracy-of-identifycommunityareas-function" class="section level2">
+<h2>Test Accuracy of IdentifyCommunityAreas() Function</h2>
+<p>Fortunately for us, the accuracy of the <code>IdentifyCommunityAreas()</code> function can be tested thanks to the City of Chicago data portal.</p>
+<p><a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a> is a data set which hosts geographical boundary data for each CPS school for the 2016-2017 school year. Of the 15 columns it contains, one of them <code>commarea</code> for the current community area each particular school resides in.</p>
+<div id="account-for-school-closures-and-school-opening" class="section level3">
+<h3>Account for School Closures and School Opening</h3>
+<p>Unfortunately, schools close more frequently than anyone would like to imagine. <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a> was updated on August 31, 2016. It contains 670 records for 670 schools which were presumably open at the time of the update.</p>
+<p>On the other hand, <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a> was updated on September 20, 2017. It contains 661 records for 661 schools which were presumably open at the time of the update.</p>
+<p>For the accuracy of the <code>IdentifyCommunityAreas()</code> function, I will exclude those 9 schools which are not present in the more recent data set. I will also check and exclude any new schools which are not present in the older data set.</p>
+<pre class="r"><code># import CPS SY1617 location data
+cps.sy1617.location.url &lt;- &quot;https://data.cityofchicago.org/api/views/75e5-35kf/rows.csv?accessType=DOWNLOAD&quot;
+
+# transform into a data frame using base &#39;read.csv()&#39;
+cps.sy1617.location &lt;- read.csv( file = cps.sy1617.location.url
+                                , header = TRUE
+                                , stringsAsFactors = FALSE
+                                )
+# test which school&#39;s appear in both data sets
+# by seeing which School_IDs match in the other
+cps.sy1617.location$in.other.data &lt;- ifelse( test = cps.sy1617.location$School_ID %in% cps.sy1617$School_ID
+                                             , yes = TRUE
+                                             , no = FALSE
+                                             )
+# repeat for the newer data set
+cps.sy1617$in.other.data &lt;- ifelse( test = cps.sy1617$School_ID %in% cps.sy1617.location$School_ID
+                                    , yes = TRUE
+                                    , no = FALSE
+                                    )
+# include those schools which contain a TRUE value in their $in.other.data column
+cps.sy1617.location &lt;- cps.sy1617.location[ which(
+  cps.sy1617.location$in.other.data == TRUE
+  ), ]
+# repeat for the newer data set
+cps.sy1617 &lt;- cps.sy1617[ which(
+  cps.sy1617$in.other.data == TRUE
+  ), ]
+
+# re order each data set so that records appear in ascending order by School_ID
+cps.sy1617.location &lt;- cps.sy1617.location[ 
+  order( cps.sy1617.location$School_ID )
+  , ]
+cps.sy1617 &lt;- cps.sy1617[ order( cps.sy1617$School_ID ) , ]
+
+# ensure row.names are correct
+row.names( cps.sy1617.location ) &lt;- as.character( 1:nrow( cps.sy1617.location ) )
+row.names( cps.sy1617 ) &lt;- as.character( 1:nrow( cps.sy1617 ) )
+
+# add update_date columns
+cps.sy1617.location$update_date &lt;- as.Date( x = &quot;2016-08-31&quot; )
+cps.sy1617$update_date &lt;- as.Date( x = &quot;2017-09-20&quot; )</code></pre>
+</div>
+<div id="peak-inside-both-data-sets" class="section level3">
+<h3>Peak Inside Both Data Sets</h3>
+<pre class="r"><code># display a few rows and columns from older data set
+cps.sy1617.location %&gt;% # call df
+  select( update_date
+              , Short_Name
+              , School_ID
+              , COMMAREA ) %&gt;% # select certain columns
+  head() %&gt;% # show only first six rows
+  pander( digits = 6
+          , caption = &quot;Sample of CPS Locations SY1617 - August 31, 2016&quot;) # Prints an R object in Pandoc&#39;s markdown, allow for more digits to be shown to the user</code></pre>
+<table>
+<caption>Sample of CPS Locations SY1617 - August 31, 2016</caption>
+<colgroup>
+<col width="18%" />
+<col width="37%" />
+<col width="16%" />
+<col width="27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">update_date</th>
+<th align="center">Short_Name</th>
+<th align="center">School_ID</th>
+<th align="center">COMMAREA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">2016-08-31</td>
+<td align="center">GLOBAL CITIZENSHIP</td>
+<td align="center">400009</td>
+<td align="center">GARFIELD RIDGE</td>
+</tr>
+<tr class="even">
+<td align="center">2016-08-31</td>
+<td align="center">ACE TECH HS</td>
+<td align="center">400010</td>
+<td align="center">WASHINGTON PARK</td>
+</tr>
+<tr class="odd">
+<td align="center">2016-08-31</td>
+<td align="center">LOCKE A</td>
+<td align="center">400011</td>
+<td align="center">EAST GARFIELD PARK</td>
+</tr>
+<tr class="even">
+<td align="center">2016-08-31</td>
+<td align="center">ASPIRA - EARLY COLLEGE HS</td>
+<td align="center">400013</td>
+<td align="center">AVONDALE</td>
+</tr>
+<tr class="odd">
+<td align="center">2016-08-31</td>
+<td align="center">ASPIRA - HAUGAN</td>
+<td align="center">400017</td>
+<td align="center">ALBANY PARK</td>
+</tr>
+<tr class="even">
+<td align="center">2016-08-31</td>
+<td align="center">CATALYST - CIRCLE ROCK</td>
+<td align="center">400021</td>
+<td align="center">AUSTIN</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># display a few rows and columns from newer data set
+cps.sy1617 %&gt;% # call df
+  select( update_date
+              , Short_Name
+              , School_ID
+              , Community_Area ) %&gt;% # select certain columns
+  head() %&gt;% # show only first six rows
+  pander( digits = 6
+          , caption = &quot;Sample of CPS Locations SY1617 - September 20, 2017&quot;) # Prints an R object in Pandoc&#39;s markdown, allow for more digits to be show</code></pre>
+<table>
+<caption>Sample of CPS Locations SY1617 - September 20, 2017</caption>
+<colgroup>
+<col width="18%" />
+<col width="37%" />
+<col width="16%" />
+<col width="27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">update_date</th>
+<th align="center">Short_Name</th>
+<th align="center">School_ID</th>
+<th align="center">Community_Area</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">2017-09-20</td>
+<td align="center">GLOBAL CITIZENSHIP</td>
+<td align="center">400009</td>
+<td align="center">GARFIELD RIDGE</td>
+</tr>
+<tr class="even">
+<td align="center">2017-09-20</td>
+<td align="center">ACE TECH HS</td>
+<td align="center">400010</td>
+<td align="center">WASHINGTON PARK</td>
+</tr>
+<tr class="odd">
+<td align="center">2017-09-20</td>
+<td align="center">LOCKE A</td>
+<td align="center">400011</td>
+<td align="center">EAST GARFIELD PARK</td>
+</tr>
+<tr class="even">
+<td align="center">2017-09-20</td>
+<td align="center">ASPIRA - EARLY COLLEGE HS</td>
+<td align="center">400013</td>
+<td align="center">AVONDALE</td>
+</tr>
+<tr class="odd">
+<td align="center">2017-09-20</td>
+<td align="center">ASPIRA - HAUGAN</td>
+<td align="center">400017</td>
+<td align="center">ALBANY PARK</td>
+</tr>
+<tr class="even">
+<td align="center">2017-09-20</td>
+<td align="center">CATALYST - CIRCLE ROCK</td>
+<td align="center">400021</td>
+<td align="center">AUSTIN</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="test-unique-community-area-spelling" class="section level3">
+<h3>Test Unique Community Area Spelling</h3>
+<p>To test the unique current community area objects for exact equality, I’ll be using the <code>identical()</code> function. To my knowledge, there are no spelling mistakes in either data set. It is also important to note that both sets of current community area values are upper case.</p>
+<pre class="r"><code># test alphabetized unique Community Area objects
+# to ensure spelling is correct 
+identical( x = sort( unique( cps.sy1617$Community_Area ) )
+           , y = sort( unique( cps.sy1617.location$COMMAREA ) )
+           )</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>The TRUE value lets us know that spelling will not be cause of any mismatches.</p>
+</div>
+<div id="test-if-each-school-was-assigned-the-same-community-area-label" class="section level3">
+<h3>Test If Each School Was Assigned the Same Community Area Label</h3>
+<p>Continuing to use the <code>identifical()</code> function, we now put <code>IdentifyCommunityAreas()</code> to the test.</p>
+<pre class="r"><code># test Community Area objects between the two data sets
+# for exact equality
+identical( x = cps.sy1617.location$COMMAREA
+           , y = cps.sy1617$Community_Area
+           )</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>Why did the <code>identical()</code> test fail? Which schools were non-matches? Why were they non-matches? What went wrong with <code>IdentifyCommunityAreas()</code>?</p>
+<pre class="r"><code># store School_IDs of those CPS schools
+# which did not share the same Community Area value as that in the other data set
+non.identical &lt;- cps.sy1617.location$School_ID[
+  which( cps.sy1617.location$COMMAREA != cps.sy1617$Community_Area )
+]
+
+# display non identical Community Area values from older data set
+cps.sy1617.location %&gt;% # call df
+  filter( School_ID %in% non.identical ) %&gt;% # Only include those School_IDs which appear in the non.identical vector
+  select( update_date
+          , Short_Name
+          , School_ID
+          , COMMAREA
+          , Address
+          , Long
+          , Lat
+          ) %&gt;% # select a few columns
+  pander( digits = 7
+          , caption = &quot;CPS Schools with Non-match Community Areas - August 31, 2016&quot;) # Prints an R object in Pandoc&#39;s markdown, allow for more digits to be show</code></pre>
+<table>
+<caption>CPS Schools with Non-match Community Areas - August 31, 2016 (continued below)</caption>
+<colgroup>
+<col width="17%" />
+<col width="41%" />
+<col width="15%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">update_date</th>
+<th align="center">Short_Name</th>
+<th align="center">School_ID</th>
+<th align="center">COMMAREA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">2016-08-31</td>
+<td align="center">LEARN - EXCEL</td>
+<td align="center">400048</td>
+<td align="center">EAST GARFIELD PARK</td>
+</tr>
+<tr class="even">
+<td align="center">2016-08-31</td>
+<td align="center">CAMELOT - EXCEL SOUTH SHORE HS</td>
+<td align="center">400175</td>
+<td align="center">WOODLAWN</td>
+</tr>
+<tr class="odd">
+<td align="center">2016-08-31</td>
+<td align="center">CAMELOT - EXCEL SOUTHWEST HS</td>
+<td align="center">400176</td>
+<td align="center">AUBURN GRESHAM</td>
+</tr>
+</tbody>
+</table>
+<table style="width:67%;">
+<colgroup>
+<col width="33%" />
+<col width="16%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Address</th>
+<th align="center">Long</th>
+<th align="center">Lat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">3021 W CARROLL AVE</td>
+<td align="center">-87.70207</td>
+<td align="center">41.88732</td>
+</tr>
+<tr class="even">
+<td align="center">7530 S SOUTH SHORE DR</td>
+<td align="center">-87.55649</td>
+<td align="center">41.75975</td>
+</tr>
+<tr class="odd">
+<td align="center">7014 S WASHTENAW AVE</td>
+<td align="center">-87.69073</td>
+<td align="center">41.76593</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># display non identical Community Area values from newer data set
+cps.sy1617 %&gt;% # call df 
+  filter( School_ID %in% non.identical ) %&gt;% # Only include those School_IDs which appear in the non.identical vector
+  select( update_date
+          , Short_Name
+          , School_ID
+          , Community_Area
+          , Address
+          , School_Longitude
+          , School_Latitude
+          ) %&gt;% # select a few columns
+  pander( digits = 7
+          , caption = &quot;CPS Schools with Non-match Community Areas - September 20, 2017&quot;) # # Prints an R object in Pandoc&#39;s markdown, allow for more digits to be show</code></pre>
+<table>
+<caption>CPS Schools with Non-match Community Areas - September 20, 2017 (continued below)</caption>
+<colgroup>
+<col width="18%" />
+<col width="43%" />
+<col width="16%" />
+<col width="21%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">update_date</th>
+<th align="center">Short_Name</th>
+<th align="center">School_ID</th>
+<th align="center">Community_Area</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">2017-09-20</td>
+<td align="center">LEARN - EXCEL</td>
+<td align="center">400048</td>
+<td align="center">NEAR WEST SIDE</td>
+</tr>
+<tr class="even">
+<td align="center">2017-09-20</td>
+<td align="center">CAMELOT - EXCEL SOUTHSHORE HS</td>
+<td align="center">400175</td>
+<td align="center">SOUTH SHORE</td>
+</tr>
+<tr class="odd">
+<td align="center">2017-09-20</td>
+<td align="center">CAMELOT - EXCEL SOUTHWEST HS</td>
+<td align="center">400176</td>
+<td align="center">CHICAGO LAWN</td>
+</tr>
+</tbody>
+</table>
+<table style="width:86%;">
+<colgroup>
+<col width="33%" />
+<col width="26%" />
+<col width="26%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Address</th>
+<th align="center">School_Longitude</th>
+<th align="center">School_Latitude</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">3021 W CARROLL AVE</td>
+<td align="center">-87.68657</td>
+<td align="center">41.87469</td>
+</tr>
+<tr class="even">
+<td align="center">7530 S SOUTH SHORE DR</td>
+<td align="center">-87.55649</td>
+<td align="center">41.75975</td>
+</tr>
+<tr class="odd">
+<td align="center">7014 S WASHTENAW AVE</td>
+<td align="center">-87.69073</td>
+<td align="center">41.76593</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="reasons-for-few-non-identical-community-area-values" class="section level3">
+<h3>Reasons for Few Non-Identical Community Area Values</h3>
+<p>As you see, we have 3 non-matches between the two CPS data sets. To investigate, I did a Google Maps search of each address and cross-validated it <a href="https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-current-/cauq-8yn6">manually using the web-version of Chicago’s community area boundaries</a>.</p>
+<div id="incorrect-coordinate-pairs" class="section level4">
+<h4>Incorrect Coordinate Pairs</h4>
+<p>For the <a href="http://www.learncharter.org/campuses/learn-excel">L.E.A.R.N. - Excel Campus</a>, the non-match was a result of incorrect coordinate pairs from the newer data set, <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a>.</p>
+<p>A quick <a href="https://www.google.com/maps/place/3021+W+Carroll+Ave,+Chicago,+IL+60612/@41.8868172,-87.7063419,16z/data=!4m5!3m4!1s0x880e32af52dede4b:0xe59730dfff5dbe89!8m2!3d41.8872965!4d-87.7025439">Google Maps search for 3021 West Carroll Avenue, Chicago, IL</a> results in a longitude of -87.7062419 and a latitude of 41.8868172, showing this address to reside within the East Garfield Park community area.</p>
+<p>However, the coordinate pair given was a longitude of -87.68657 and a latitude of 41.87469.</p>
+</div>
+<div id="incorrect-comparison-data" class="section level4">
+<h4>Incorrect Comparison Data</h4>
+<p>For the <a href="http://cameloteducation.org/our-schools/accelerated-schools/excel-academy-of-south-shore">Chicago Excel Academy of South Shore</a>, the non-match was a result of incorrect assignment of current community area from the older data set, <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a>.</p>
+<p>A quick <a href="https://www.google.com/maps/place/3021+W+Carroll+Ave,+Chicago,+IL+60612/@41.8868172,-87.7063419,16z/data=!4m5!3m4!1s0x880e32af52dede4b:0xe59730dfff5dbe89!8m2!3d41.8872965!4d-87.7025439">Google Maps search for 7530 S. South Shore Drive Chicago, IL. 60649</a> results in a longitude of -87.7062419 and a latitude of 41.7605135, show this address to reside within the South Shore community area.</p>
+<p>Both the older and newer data sets contained a longitude value of -87.55649 and a latitude value 41.75975. The <code>IdentifyCommunityAreas()</code> properly assigned the coordinate pair as South Shore; while the older dat set incorrectly assigned it as Woodlawn.</p>
+<p>For the <a href="http://cameloteducation.org/our-schools/accelerated-schools/excel-academy-of-southwest">Chicago Excel Academy of Southwest</a>, the non-match was a result of incorrect assignment of current community area from the older data set, <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a>.</p>
+<p>A quick <a href="https://www.google.com/maps/place/3021+W+Carroll+Ave,+Chicago,+IL+60612/@41.8868172,-87.7063419,16z/data=!4m5!3m4!1s0x880e32af52dede4b:0xe59730dfff5dbe89!8m2!3d41.8872965!4d-87.7025439">Google Maps search for 7014 S. Washtenaw St. Chicago, IL 60629</a> results in a longitude of -87.6927955, and a latitude of 41.7658013, show this address to reside within the Chicago Lawn community area.</p>
+<p>Both the older and newer data sets contained a longitude value of -87.69073 and a latitude value 41.76593. The <code>IdentifyCommunityAreas()</code> properly assigned the school as residing in Chicago Lawn; while the older dat set incorrectly assigned it as Auburn Gresham.</p>
+</div>
+</div>
+<div id="revisting-questions" class="section level3">
+<h3>Revisting Questions</h3>
+<p>Let’s revisit the questions I asked when there was not an exact match between the two community area objects:</p>
+<ul>
+<li>Why did the <code>identical()</code> test fail?
+<ul>
+<li>Despite ordering both data sets by <code>School_ID</code>, the testing for exact equality on both community area labels failed due two factors: incorrect coordinate pairs and incorrect comparison data.</li>
+</ul></li>
+<li>Which schools were non-matches?
+<ul>
+<li>L.E.A.R.N. - Excel Campus, Chicago Excel Academy of South Shore, and Chicago Excel Academy of Southwest were the schools with non-matches.</li>
+</ul></li>
+<li>Why were they non-matches?
+<ul>
+<li><code>IdentifyCommunityAreas()</code> assigned L.E.A.R.N - Excel Campus into the Near West Side community area based on incorrect coordinate pair data, meaning that both the longitude and latitude were not associated with the address of the school. This can be attributed to data entry error on part of the data source: <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a>. The two other Chicago Excel Academy schools failed due to incorrect community area assignment in comparison data source: <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a>.</li>
+</ul></li>
+<li>What went wrong with <code>IdentifyCommunityAreas()</code>?
+<ul>
+<li>Assumed that all longitude and latitude data was correct from <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a>. Additionally, creating a more general version of this function is bound to reveal unforeseen edge cases that this tutorial missed.</li>
+</ul></li>
+</ul>
+</div>
+<div id="correcting-incorrect-coordinate-pair" class="section level3">
+<h3>Correcting Incorrect Coordinate Pair</h3>
+<p>After replacing L.E.A.R.N. - Excel Campus’ incorrect coordinate pair with the correct pair, re-run <code>IdentifyCommunityAreas()</code>.</p>
+<pre class="r"><code># replace the current Long data
+# for the L.E.A.R.N. - Excel Campus
+# with the correct Long data
+cps.sy1617$School_Longitude[
+  which( cps.sy1617$Long_Name == &quot;L.E.A.R.N. - Excel Campus&quot; )
+] &lt;- -87.7062419
+
+# replace the current Lat data
+# for the L.E.A.R.N. - Excel Campus
+# with the correct Lat data
+cps.sy1617$School_Latitude[
+  which( cps.sy1617$Long_Name == &quot;L.E.A.R.N. - Excel Campus&quot; )
+] &lt;- 41.8868172
+
+# rerun IdentifyCommunityAreas()
+cps.sy1617$Community_Area &lt;- IdentifyCommunityAreas( a.data.frame = cps.sy1617
+                                                     , a.list.of.coordinates = comarea606.polygons
+                                                     )
+# show the correction
+cps.sy1617 %&gt;% # call df
+  filter( cps.sy1617$Long_Name == &quot;L.E.A.R.N. - Excel Campus&quot; ) %&gt;% # only include one school
+  select( update_date
+          , Short_Name
+          , School_ID
+          , Community_Area
+          , Address
+          , School_Longitude
+          , School_Latitude
+          ) %&gt;% # select certain variables
+  pander( digit = 7
+          , caption = &quot;Correct L.E.A.RN. - Excel Campus Community Area&quot; )</code></pre>
+<table style="width:86%;">
+<caption>Correct L.E.A.RN. - Excel Campus Community Area (continued below)</caption>
+<colgroup>
+<col width="19%" />
+<col width="22%" />
+<col width="16%" />
+<col width="27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">update_date</th>
+<th align="center">Short_Name</th>
+<th align="center">School_ID</th>
+<th align="center">Community_Area</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">2017-09-20</td>
+<td align="center">LEARN - EXCEL</td>
+<td align="center">400048</td>
+<td align="center">EAST GARFIELD PARK</td>
+</tr>
+</tbody>
+</table>
+<table style="width:82%;">
+<colgroup>
+<col width="29%" />
+<col width="26%" />
+<col width="26%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Address</th>
+<th align="center">School_Longitude</th>
+<th align="center">School_Latitude</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">3021 W CARROLL AVE</td>
+<td align="center">-87.70624</td>
+<td align="center">41.88682</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="visualize" class="section level2">
+<h2>Visualize</h2>
+<p>Plot a new map of CPS schools that only reside in any of the three Community Areas:</p>
+<ul>
+<li>Irving Park</li>
+<li>South Lawndale</li>
+<li>Washington Heights</li>
+</ul>
+<pre class="r"><code># clear margin space
+par( mar = c( 2, 0, 2, 0 )
+     , bg = &quot;#06369D&quot; # cps blue
+     )
+
+# plot the polygons
+plot( comarea606
+      , main = &quot;CPS Schools in Selected Community Areas, 2016-2017 School Year&quot;
+      , col.main = &quot;#F0F3F4&quot;
+      , col = &quot;#06369D&quot; # cps blue
+      , border = &quot;#F0F3F4&quot;
+      ) 
+# highlight Irving Park
+plot( comarea606[ which( comarea606$community == &quot;IRVING PARK&quot;) , ]
+      , col = &quot;#06369D&quot; # cps blue
+      , border = &quot;#CCFFFF&quot;
+      , add = TRUE
+      , lwd = 2
+      )
+# highlight South Lawndale
+plot( comarea606[ which( comarea606$community == &quot;SOUTH LAWNDALE&quot;) , ]
+      , col = &quot;#06369D&quot; # cps blue
+      , border = &quot;#EC68AC&quot;
+      , add = TRUE
+      , lwd = 2
+      )
+# highlight Washington Heights
+plot( comarea606[ which( comarea606$community == &quot;WASHINGTON HEIGHTS&quot;) , ]
+      , col = &quot;#06369D&quot; # cps blue
+      , border = &quot;#FFFF00&quot;
+      , add = TRUE
+      , lwd = 2
+      )
+# create a legend
+legend( &quot;left&quot;
+        , pt.cex = 2
+        , legend = c( &quot;CPS Schools&quot;
+          , &quot;Irving Park&quot;
+          , &quot;South Lawndale&quot;
+          , &quot;Washington Heights&quot;
+                     )
+        , pch = c(20, 22, 22, 22)
+        , text.col = &quot;#F0F3F4&quot;
+        , col = c( rgb( red = 249
+                     , green = 245
+                     , blue = 97
+                     , alpha = 100 # add some transparency
+                     , maxColorValue = 255
+                     ) # bright yellow
+          , &quot;#CCFFFF&quot;
+          , &quot;#EC68AC&quot;
+          , &quot;#FFFF00&quot;
+          )
+        , bty = &quot;n&quot;
+        )
+
+# add the points for Irving Park
+points( x = cps.sy1617$School_Longitude[ cps.sy1617$Community_Area ==
+                                           &quot;IRVING PARK&quot;
+                                         ]
+        , y = cps.sy1617$School_Latitude[ cps.sy1617$Community_Area ==
+                                           &quot;IRVING PARK&quot;
+                                         ]
+        , col = rgb( red = 249
+                     , green = 245
+                     , blue = 97
+                     , alpha = 100 # add some transparency
+                     , maxColorValue = 255
+                     ) # bright yellow
+        , pch = 20 # for more information on point type, look at ?par
+          )
+
+# add the points for South Lawndale
+points( x = cps.sy1617$School_Longitude[ cps.sy1617$Community_Area ==
+                                           &quot;SOUTH LAWNDALE&quot;
+                                         ]
+        , y = cps.sy1617$School_Latitude[ cps.sy1617$Community_Area ==
+                                           &quot;SOUTH LAWNDALE&quot;
+                                         ]
+        , col = rgb( red = 249
+                     , green = 245
+                     , blue = 97
+                     , alpha = 100 # add some transparency
+                     , maxColorValue = 255
+                     ) # bright yellow
+        , pch = 20 # for more information on point type, look at ?par
+          )
+
+# add the points for Washington Heights
+points( x = cps.sy1617$School_Longitude[ cps.sy1617$Community_Area ==
+                                           &quot;WASHINGTON HEIGHTS&quot;
+                                         ]
+        , y = cps.sy1617$School_Latitude[ cps.sy1617$Community_Area ==
+                                           &quot;WASHINGTON HEIGHTS&quot;
+                                         ]
+        , col = rgb( red = 249
+                     , green = 245
+                     , blue = 97
+                     , alpha = 100 # add some transparency
+                     , maxColorValue = 255
+                     ) # bright yellow
+        , pch = 20 # for more information on point type, look at ?par
+          )
+
+# add data source
+mtext( side = 1
+       , adj = 0.99
+       , line = 1
+       , cex = 0.75
+       , text = &quot;Source: Chicago Public Schools - School Profile Information SY1617&quot;
+       , col = &quot;#F0F3F4&quot;
+       )</code></pre>
+<p><img src="Label_Points_Inside_Polygons_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="final-thoughts" class="section level1">
+<h1>Final Thoughts</h1>
+<p>Working with spatial elements in R is an accessible way to showcase data in a context people are already familiar with in their lives. However, as seen through testing the accuracy of the <code>IdentifyCommunityAreas()</code> function, no one’s work is safe from data entry error or unchecked assumptions.</p>
+<p>No matter how official the data source, always double check essential data - i.e. the longitude and latitude from <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a> - that feeds the critical function for your analysis. Despite correctly identifying 659 school’s community areas out of 660, the 1 school that was not found was an excellent example of understanding the limits of data. Assume nothing; double check everything.</p>
+</div>
+<div id="about-me" class="section level1">
+<h1>About Me</h1>
+<p>Thank you for reading this tutorial. My name is Cristian E. Nuno and I am an aspiring data scientist. To see more of my work, please visit my professional portfolio <a href="https://cenuno.github.io/"><em>Urban Data Science</em></a>.</p>
+<div id="session-info-and-rstudio-version" class="section level2">
+<h2>Session Info and RStudio Version</h2>
+<pre class="r"><code># Print version information about R, the OS and attached or loaded packages.
+sessionInfo()</code></pre>
+<p>R version 3.4.3 (2017-11-30) Platform: x86_64-apple-darwin15.6.0 (64-bit) Running under: macOS Sierra 10.12.6</p>
+<p>Matrix products: default BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib</p>
+<p>locale: [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</p>
+<p>attached base packages: [1] stats graphics grDevices utils datasets methods base</p>
+<p>other attached packages: [1] bindrcpp_0.2 pander_0.6.1 magrittr_1.5 dplyr_0.7.4<br />
+[5] splancs_2.01-40 rgdal_1.2-15 sp_1.2-5</p>
+<p>loaded via a namespace (and not attached): [1] Rcpp_0.12.13 knitr_1.17 bindr_0.1 lattice_0.20-35 [5] R6_2.2.2 rlang_0.1.4 stringr_1.2.0 tools_3.4.2<br />
+[9] grid_3.4.2 htmltools_0.3.6 yaml_2.1.14 assertthat_0.2.0 [13] digest_0.6.12 rprojroot_1.2 tibble_1.3.4 rsconnect_0.8.5 [17] glue_1.2.0 evaluate_0.10.1 rmarkdown_1.8 stringi_1.1.6<br />
+[21] compiler_3.4.2 backports_1.1.1 pkgconfig_2.0.1</p>
+</div>
+</div>
+
+<br>
+<span style="color:#CCCCCC">Copyright &copy; 2017 - 2018. Urban Data Science. Email me at <a href='mailto:nuno.e.cristian@gmail.com'>nuno DOT e DOT cristian AT gmail DOT com</a>. All rights reserved. See Disclaimer for further details.</span>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

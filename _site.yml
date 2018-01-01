@@ -9,7 +9,7 @@ navbar:
     menu:
     - text: "R"
     - text: "Label Points Inside Polygons"
-      href: Label_Points_inside_Polygons.html
+      href: Label_Points_Inside_Polygons.html
     - text: "Make a Choropleth Map"
       href: choropleth_map.html
     - text: "Highlight Points Inside a Certain Radius"

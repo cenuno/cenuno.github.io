@@ -216,7 +216,7 @@ us.states <- sp::merge( x = us.states
 
 After all that hard work, now is the time to create the choropleth map.
 
-<center>![](/Users/cristiannuno/RStudio_All/US_State_Shapefiles/awesome_people.png)</center>
+<img src='/Users/cristiannuno/RStudio_All/US_State_Shapefiles/awesome_people.png' style='margin:0px auto; display:block; width: 100%' class='center'>
 
 ```{r, eval = FALSE}
 # clear margin space and set plot background color

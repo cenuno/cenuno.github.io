@@ -8,7 +8,6 @@ output:
     toc: TRUE
     toc_float: TRUE
     code_folding: hide
-    fig_caption: TRUE
 ---
 <base target="_top"/>
 
@@ -217,7 +216,7 @@ us.states <- sp::merge( x = us.states
 
 After all that hard work, now is the time to create the choropleth map.
 
-<center>![ss](/Users/cristiannuno/RStudio_All/US_State_Shapefiles/awesome_people.png)</center>
+<center>![](/Users/cristiannuno/RStudio_All/US_State_Shapefiles/awesome_people.png)</center>
 
 ```{r, eval = FALSE}
 # clear margin space and set plot background color

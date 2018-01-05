@@ -405,6 +405,7 @@ div.tocify {
 <center>
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg/350px-Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg.png" />
 </center>
+<p><em>Image Courtesy of <a href="https://commons.wikimedia.org/wiki/File:Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg">Wiki Media Commons</a></em></p>
 <div id="importing-polygons-into-r" class="section level2">
 <h2>Importing Polygons into R</h2>
 <p>Fortunately, importing polygons into R is easy.</p>
@@ -442,7 +443,7 @@ comarea606 &lt;- readOGR( dsn = geojson_comarea_url
 </div>
 <div id="points" class="section level1">
 <h1>Points</h1>
-<p>Points on a map represent longitudinal and latitudinal coordinates, a unique pair that specifies an address. <img src="Label_Points_Inside_Polygons_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Points on a map represent longitudinal and latitudinal coordinates, a unique pair that specifies an address. <img src="Label_Points_Inside_Polygons_files/figure-html/unnamed-chunk-2-1.png" width="672" /> <em>Image Courtesy of <a href="https://www.google.com/permissions/using-product-graphics.html">Google Maps</a></em></p>
 <div id="when-longitude-and-latitude-are-not-given-you-may-find-them-by-geocoding" class="section level2">
 <h2>When Longitude and Latitude Are Not Given, You May Find Them by Geocoding</h2>
 <p>In the event that coordinate pairs are not given in your data set, see if they have a <code>full_address</code> variable that is composed of street address, city, state, and zip code. If not, see if each of those is its own variable.</p>
@@ -582,94 +583,15 @@ comarea606.polygons &lt;- GetPolygonCoordinates( comarea606 ) # list of 77 matri
 # inside the `comarea606` spatial polygon data frame
 names( comarea606.polygons ) &lt;- comarea606$community</code></pre>
 </div>
-<div id="create-a-community_area-placeholder-variable" class="section level2">
-<h2>Create a Community_Area Placeholder Variable</h2>
-<p>Create a <code>Community_Area</code> variable that will be used to store the name of the polygon that points belong to in the spatial data frame.</p>
-<p>For now, assign every row in the <code>Community Area</code> variable with the value <code>NA</code>.</p>
-<p><strong>Should a coordinate pair in your data frame not be in any of the polygons</strong>, the function <code>IdentifyCommunityAreas()</code> will simply skip over that point.</p>
-<pre class="r"><code># import necessary packages
-library( dplyr )
-library( magrittr )
-library( pander )
-
-# Create &#39;Community_Area&#39; variable inside the data frame
-# and assign it a value of NA
-cps.sy1617$Community_Area &lt;- NA
-
-# peak inside the data frame BEFORE the transformation
-cps.sy1617 %&gt;% # call df
-  select( Short_Name
-              , School_Longitude
-              , School_Latitude
-              , Community_Area ) %&gt;% # select certain columns
-  head() %&gt;% # only show first six rows
-  pander( digit = 7
-          , caption = &quot;Sample of Chicago Public Schools - School Profile Information SY1617&quot;
-          ) # prints an R object in Pandoc&#39;s markdown</code></pre>
-<table>
-<caption>Sample of Chicago Public Schools - School Profile Information SY1617</caption>
-<colgroup>
-<col width="24%" />
-<col width="26%" />
-<col width="24%" />
-<col width="24%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Short_Name</th>
-<th align="center">School_Longitude</th>
-<th align="center">School_Latitude</th>
-<th align="center">Community_Area</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">SAYRE</td>
-<td align="center">-87.79872</td>
-<td align="center">41.91415</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">MCNAIR</td>
-<td align="center">-87.74673</td>
-<td align="center">41.89782</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">HOLDEN</td>
-<td align="center">-87.65379</td>
-<td align="center">41.83803</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">ACERO - ZIZUMBO</td>
-<td align="center">-87.7305</td>
-<td align="center">41.81014</td>
-<td align="center">NA</td>
-</tr>
-<tr class="odd">
-<td align="center">MURPHY</td>
-<td align="center">-87.71683</td>
-<td align="center">41.95008</td>
-<td align="center">NA</td>
-</tr>
-<tr class="even">
-<td align="center">BATEMAN</td>
-<td align="center">-87.70215</td>
-<td align="center">41.95822</td>
-<td align="center">NA</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="create-identifycommunityareas-function" class="section level2">
-<h2>Create IdentifyCommunityAreas() Function</h2>
-<p>Now to put it all together with a function that takes two R objects:</p>
+<div id="create-labelpointswithinpolygons-function" class="section level2">
+<h2>Create LabelPointsWithinPolygons() Function</h2>
+<p>Now to put it all together with a function that contains three arguments:</p>
 <ol style="list-style-type: decimal">
-<li><p>A data frame containing a longitude and latitude point for every row</p></li>
-<li><p>A list of coordinates within every polygon from a spatial drame</p></li>
+<li><p><code>Long</code>: A vector of logitudinal points</p></li>
+<li><p><code>Lat</code>: A vector of latitudinal points</p></li>
+<li><p><code>a.list.of.coordinates</code>: A list of coordinates within every polygon from a spatial data frame</p></li>
 </ol>
-<p>and assigns individual points the name of the polygon they reside in.</p>
+<p>and returns a character vector of the the name of the polygon individual points reside in.</p>
 <div id="notes" class="section level3">
 <h3>Notes</h3>
 <div id="points-that-may-not-exist-within-any-of-the-polygons" class="section level4">
@@ -683,17 +605,28 @@ cps.sy1617 %&gt;% # call df
 <div id="assuming-a-complete-list-of-non-na-coordinate-pairs" class="section level4">
 <h4>Assuming a complete list of non-NA coordinate pairs</h4>
 <p>At the moment, the following function assumes the data frame contains <code>longitude</code> and <code>latitude</code> pairs which do not contain a single NA value.</p>
-<pre class="r"><code>IdentifyCommunityAreas &lt;- function( a.data.frame
-                                    , a.list.of.coordinates
-                                    ) {
+<pre class="r"><code>LabelPointsWithinPolygons &lt;- function( Long
+                                       , Lat
+                                       , a.list.of.coordinates ) {
   # 1. Ensure necessary packages are imported
   require( splancs )
   
-  # 2. Create &#39;Community_Area&#39; variable inside the data frame
+  # 2. Create &#39;polygon.label&#39; vector
   # and assign it a value of NA. This variable will be used to
   # identify which coordinate pairs exist within which particular
   # polygons from a.spatial.df
-  a.data.frame$Community_Area &lt;- NA
+  polygon.label &lt;- ifelse( test = identical( x = length( Long )
+                                       , y = length( Lat )
+                                       )
+                     , yes = rep( x = NA
+                                  , times = length( Long )
+                                  )
+                     , no = stop( paste( &quot;Length of Long is&quot;, length( Long)
+                                         , &quot;but the length of Lat is&quot;, length( Lat )
+                                         , &quot;. Ensure the two are of equivalent lengths prior to executing the LabelPointsWithinPolygons() function.&quot;
+                                         )
+                                  )
+  )
   
   # 3. Start your counter
   i &lt;- 1
@@ -702,22 +635,17 @@ cps.sy1617 %&gt;% # call df
   while( length( a.list.of.coordinates ) &gt;= i  ) {
     
     # 5. Create a coordinate pair data frame
-    df.lon.lat &lt;- a.data.frame[ c( &quot;School_Longitude&quot;
-                                   , &quot;School_Latitude&quot;
-                                   )
-                                ]
+    #    and ensure Long and Lat are both cast as numeric
+    df.lon.lat &lt;- data.frame( Long = as.numeric( Long )
+                              , Lat = as.numeric( Lat )
+                              , stringsAsFactors = FALSE
+    )
     
     # 6. Rename the columns within df.lon.lat
     
-    # rename &quot;School_Longitude&quot; as &quot;x&quot;
-    colnames( df.lon.lat )[ 
-      which( colnames( df.lon.lat ) == &quot;School_Longitude&quot; ) 
-      ] &lt;- &quot;x&quot;
-    
-    # rename &quot;School_Latitude&quot; as &quot;y&quot;
-    colnames( df.lon.lat )[ 
-      which( colnames( df.lon.lat ) == &quot;School_Latitude&quot; ) 
-      ] &lt;- &quot;y&quot;
+    # rename &quot;Long&quot; as &quot;x&quot;
+    # and rename &quot;Lat&quot; as &quot;y&quot;
+    colnames( df.lon.lat ) &lt;- c(&quot;x&quot;, &quot;y&quot;)
     
     # 7. Test which coordinate pairs from df.lon.lat
     #    reside within the ith polygon 
@@ -742,17 +670,18 @@ cps.sy1617 %&gt;% # call df
         df.lon.lat[ which( df.lon.lat$in.polygon == TRUE ), ]
       
       # 9. Two step process:
-      #      * filter a.data.frame by including only those rows
-      #        whose $School_Longitude values appear in df.lon.lat$x
+      #      * filter polygon.label by including only those elements
+      #        whose Long values appear in df.lon.lat$x
       #        AND
-      #        whose $School_Latitude values appear in df.lon.lat$y
+      #        whose Lat values appear in df.lon.lat$y
       #
-      #      * for these filtered rows, replace their $Community_Area NA values
-      #        with the name of the ith polygon within a.list.of.coordinates
-      a.data.frame[ 
-        which( a.data.frame$School_Longitude %in% df.lon.lat$x &amp;
-                 a.data.frame$School_Latitude %in% df.lon.lat$y
-               ), ]$Community_Area &lt;- names( a.list.of.coordinates )[i]
+      #      * for these filtered elements, replace their NA values
+      #        with the name of the polygon within a.list.of.coordinates[[i]]
+      polygon.label[ 
+        which( Long %in% df.lon.lat$x &amp;
+                 Lat %in% df.lon.lat$y
+               )
+        ] &lt;- names( a.list.of.coordinates )[i]
       
       # 10. Move onto the next polygon with a list.of.coordinates
       i &lt;- i + 1
@@ -765,28 +694,32 @@ cps.sy1617 %&gt;% # call df
       # and move onto the the next polygon
       # within a.list.of.coordinates[[i]]
       i &lt;- i + 1
-
+      
     } # end of else statement
     
   } # end of while loop
   
-  # 12. return the a.data.frame$Community_Area variable
+  # 12. return polygon.label
   # to the Global Environment
-  return( a.data.frame$Community_Area )
+  return( polygon.label )
   
-} # end of IdentifyCommunityAreas() function</code></pre>
+} # end of LabelPointsWithinPolygons() function</code></pre>
 </div>
 </div>
 </div>
-<div id="use-identifycommunityareas-function" class="section level2">
-<h2>Use IdentifyCommunityAreas() Function</h2>
-<p>Run the <code>IdentifyCommunityAreas()</code> function to assign points within the data frame the names of the polygon they reside in. Peak inside to make sure it worked.</p>
-<pre class="r"><code># Run the `IdentifyCommunityAreas()` function
-cps.sy1617$Community_Area &lt;- IdentifyCommunityAreas( a.data.frame = cps.sy1617
+<div id="use-labelpointswithinpolygons-function" class="section level2">
+<h2>Use LabelPointsWithinPolygons() Function</h2>
+<p>Run the <code>LabelPointsWithinPolygons()</code> function to assign points within the data frame the names of the polygon they reside in. Peak inside to make sure it worked.</p>
+<pre class="r"><code># Run the `LabelPointsWithinPolygons()` function
+cps.sy1617$Community_Area &lt;- LabelPointsWithinPolygons( Long = cps.sy1617$School_Longitude
+                                                        , Lat = cps.sy1617$School_Latitude
                                       , a.list.of.coordinates = comarea606.polygons
                             )
 
 # peak inside the data frame AFTER the transformation
+library( dplyr )
+library( magrittr )
+library( pander )
 cps.sy1617 %&gt;% # call df
   select( Short_Name
           , School_Longitude
@@ -851,15 +784,15 @@ cps.sy1617 %&gt;% # call df
 </tbody>
 </table>
 </div>
-<div id="test-accuracy-of-identifycommunityareas-function" class="section level2">
-<h2>Test Accuracy of IdentifyCommunityAreas() Function</h2>
-<p>Fortunately for us, the accuracy of the <code>IdentifyCommunityAreas()</code> function can be tested thanks to the City of Chicago data portal.</p>
+<div id="test-accuracy-of-labelpointswithinpolygons-function" class="section level2">
+<h2>Test Accuracy of LabelPointsWithinPolygons() Function</h2>
+<p>Fortunately for us, the accuracy of the <code>LabelPointsWithinPolygons()</code> function can be tested thanks to the City of Chicago data portal.</p>
 <p><a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a> is a data set which hosts geographical boundary data for each CPS school for the 2016-2017 school year. Of the 15 columns it contains, one of them <code>commarea</code> for the current community area each particular school resides in.</p>
 <div id="account-for-school-closures-and-school-opening" class="section level3">
 <h3>Account for School Closures and School Opening</h3>
 <p>Unfortunately, schools close more frequently than anyone would like to imagine. <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a> was updated on August 31, 2016. It contains 670 records for 670 schools which were presumably open at the time of the update.</p>
 <p>On the other hand, <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a> was updated on September 20, 2017. It contains 661 records for 661 schools which were presumably open at the time of the update.</p>
-<p>For the accuracy of the <code>IdentifyCommunityAreas()</code> function, I will exclude those 9 schools which are not present in the more recent data set. I will also check and exclude any new schools which are not present in the older data set.</p>
+<p>For the accuracy of the <code>LabelPointsWithinPolygons()</code> function, I will exclude those 9 schools which are not present in the more recent data set. I will also check and exclude any new schools which are not present in the older data set.</p>
 <pre class="r"><code># import CPS SY1617 location data
 cps.sy1617.location.url &lt;- &quot;https://data.cityofchicago.org/api/views/75e5-35kf/rows.csv?accessType=DOWNLOAD&quot;
 
@@ -1046,14 +979,14 @@ identical( x = sort( unique( cps.sy1617$Community_Area ) )
 </div>
 <div id="test-if-each-school-was-assigned-the-same-community-area-label" class="section level3">
 <h3>Test If Each School Was Assigned the Same Community Area Label</h3>
-<p>Continuing to use the <code>identifical()</code> function, we now put <code>IdentifyCommunityAreas()</code> to the test.</p>
+<p>Continuing to use the <code>identifical()</code> function, we now put <code>LabelPointsWithinPolygons()</code> to the test.</p>
 <pre class="r"><code># test Community Area objects between the two data sets
 # for exact equality
 identical( x = cps.sy1617.location$COMMAREA
            , y = cps.sy1617$Community_Area
            )</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<p>Why did the <code>identical()</code> test fail? Which schools were non-matches? Why were they non-matches? What went wrong with <code>IdentifyCommunityAreas()</code>?</p>
+<p>Why did the <code>identical()</code> test fail? Which schools were non-matches? Why were they non-matches? What went wrong with <code>LabelPointsWithinPolygons()</code>?</p>
 <pre class="r"><code># store School_IDs of those CPS schools
 # which did not share the same Community Area value as that in the other data set
 non.identical &lt;- cps.sy1617.location$School_ID[
@@ -1258,7 +1191,7 @@ cps.sy1617 %&gt;% # call df
 <ul>
 <li><code>IdentifyCommunityAreas()</code> assigned L.E.A.R.N - Excel Campus into the Near West Side community area based on incorrect coordinate pair data, meaning that both the longitude and latitude were not associated with the address of the school. This can be attributed to data entry error on part of the data source: <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a>. The two other Chicago Excel Academy schools failed due to incorrect community area assignment in comparison data source: <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a>.</li>
 </ul></li>
-<li>What went wrong with <code>IdentifyCommunityAreas()</code>?
+<li>What went wrong with <code>LabelPointsWithinPolygons()</code>?
 <ul>
 <li>Assumed that all longitude and latitude data was correct from <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a>. Additionally, creating a more general version of this function is bound to reveal unforeseen edge cases that this tutorial missed.</li>
 </ul></li>
@@ -1266,7 +1199,7 @@ cps.sy1617 %&gt;% # call df
 </div>
 <div id="correcting-incorrect-coordinate-pair" class="section level3">
 <h3>Correcting Incorrect Coordinate Pair</h3>
-<p>After replacing L.E.A.R.N. - Excel Campus’ incorrect coordinate pair with the correct pair, re-run <code>IdentifyCommunityAreas()</code>.</p>
+<p>After replacing L.E.A.R.N. - Excel Campus’ incorrect coordinate pair with the correct pair, re-run <code>LabelPointsWithinPolygons()</code>.</p>
 <pre class="r"><code># replace the current Long data
 # for the L.E.A.R.N. - Excel Campus
 # with the correct Long data
@@ -1281,10 +1214,11 @@ cps.sy1617$School_Latitude[
   which( cps.sy1617$Long_Name == &quot;L.E.A.R.N. - Excel Campus&quot; )
 ] &lt;- 41.8868172
 
-# rerun IdentifyCommunityAreas()
-cps.sy1617$Community_Area &lt;- IdentifyCommunityAreas( a.data.frame = cps.sy1617
-                                                     , a.list.of.coordinates = comarea606.polygons
-                                                     )
+# Run the `LabelPointsWithinPolygons()` function
+cps.sy1617$Community_Area &lt;- LabelPointsWithinPolygons( Long = cps.sy1617$School_Longitude
+                                                        , Lat = cps.sy1617$School_Latitude
+                                      , a.list.of.coordinates = comarea606.polygons
+                            )
 # show the correction
 cps.sy1617 %&gt;% # call df
   filter( cps.sy1617$Long_Name == &quot;L.E.A.R.N. - Excel Campus&quot; ) %&gt;% # only include one school
@@ -1466,19 +1400,19 @@ mtext( side = 1
        , text = &quot;Source: Chicago Public Schools - School Profile Information SY1617&quot;
        , col = &quot;#F0F3F4&quot;
        )</code></pre>
-<p><img src="Label_Points_Inside_Polygons_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="Label_Points_Inside_Polygons_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="final-thoughts" class="section level1">
 <h1>Final Thoughts</h1>
-<p>Working with spatial elements in R is an accessible way to showcase data in a context people are already familiar with in their lives. However, as seen through testing the accuracy of the <code>IdentifyCommunityAreas()</code> function, no one’s work is safe from data entry error or unchecked assumptions.</p>
+<p>Working with spatial elements in R is an accessible way to showcase data in a context people are already familiar with in their lives. However, as seen through testing the accuracy of the <code>LabelPointsWithinPolygons()</code> function, no one’s work is safe from data entry error or unchecked assumptions.</p>
 <p>No matter how official the data source, always double check essential data - i.e. the longitude and latitude from <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Profile-Information-/8i6r-et8s/data">Chicago Public Schools - School Profile Information SY1617</a> - that feeds the critical function for your analysis. Despite correctly identifying 659 school’s community areas out of 660, the 1 school that was not found was an excellent example of understanding the limits of data. Assume nothing; double check everything.</p>
 </div>
 <div id="about-me" class="section level1">
 <h1>About Me</h1>
 <p>Thank you for reading this tutorial. My name is Cristian E. Nuno and I am an aspiring data scientist. To see more of my work, please visit my professional portfolio <a href="https://cenuno.github.io/"><em>Urban Data Science</em></a>.</p>
-<div id="session-info-and-rstudio-version" class="section level2">
-<h2>Session Info and RStudio Version</h2>
+<div id="session-info" class="section level2">
+<h2>Session Info</h2>
 <pre class="r"><code># Print version information about R, the OS and attached or loaded packages.
 sessionInfo()</code></pre>
 <p>R version 3.4.3 (2017-11-30) Platform: x86_64-apple-darwin15.6.0 (64-bit) Running under: macOS Sierra 10.12.6</p>

@@ -1,7 +1,7 @@
 ---
 title: "Label Points Inside Polygons"
 author: "Cristian Nuno"
-date: "December 25, 2017"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
     theme: readable
@@ -17,19 +17,9 @@ Working with spatial elements is what got me interested in learning [R](https://
 
 What follows is a walkthrough that goes over the [key spatial elements](http://www.nickeubank.com/wp-content/uploads/2015/10/RGIS1_SpatialDataTypes_part1_vectorData.html) needed to understand how to conduct an introductory-level of spatial analysis in R. 
 
-* Polygons
-* Points
-* Identifying Points Inside Polygons
-
 ## Necessary Packages
 
-To follow the tutorial, you'll need to install the following packages installed:
-
-* [`sp`](https://cran.r-project.org/web/packages/sp/index.html): classes and methods for spatial data.
-
-* [`rgdal`](https://cran.r-project.org/web/packages/rgdal/index.html): bindings for the [Geospatial Data Abstraction Library](http://www.gdal.org/).
-
-* [`splancs`](https://cran.r-project.org/web/packages/splancs/index.html): spatial and space-time point pattern analysis.
+To follow the tutorial, you'll need to install the following [packages installed](https://www.statmethods.net/interface/packages.html):
 
 * [`dplyr`](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html): data manipulation.
 
@@ -37,11 +27,20 @@ To follow the tutorial, you'll need to install the following packages installed:
 
 * [`pander`](http://rapporter.github.io/pander/): provide a minimal and easy tool for rendering R objects into [Pandoc's](http://pandoc.org/) markdown.
 
-```{r, eval=FALSE}
-install.packages( c( "sp", "rgdal", "splancs"
-                     , "dplyr", "magrittr", "pander"
+* [`sp`](https://cran.r-project.org/web/packages/sp/index.html): classes and methods for spatial data.
+
+* [`splancs`](https://cran.r-project.org/web/packages/splancs/index.html): spatial and space-time point pattern analysis.
+
+* [`rgdal`](https://cran.r-project.org/web/packages/rgdal/index.html): Primarily used to create spatial data frames, using the [Geospatial Data Abstraction Library](http://www.gdal.org/).
+
+
+```{r Install Packages, eval=FALSE}
+install.packages( c( "dplyr", "magrittr", "methods"
+                     , "pander", "sp", "splancs"
+                     , "rgdal", "utils"
                      )
                   )
+# two packages come pre-loaded: "methods" and "utils"
 ```
 
 # Polygons
@@ -99,28 +98,76 @@ comarea606 <- readOGR( dsn = geojson_comarea_url
 )
 ```
 
+## Understanding Spatial Data
+
+Spatial polygon data frames contain a lot of information stored in [`slots`](https://stackoverflow.com/questions/4713968/r-what-are-slots). In particular, the object `comarea606` contains the following slots:
+
+```{r Slot names of comarea606, message=FALSE}
+library( dplyr )
+library( magrittr )
+library( pander )
+methods::slotNames( x = comarea606 )
+```
+
+* `data`: a data frame object that contains high-level information for each polygon, where each row represents one of the polygons. Can be accessed using both `comarea@data` or `methods::slot( object = comarea606, name = "data" )`.
+
+```{r Examining comarea606@data}
+slot( object = comarea606, name = "data" ) %>%
+  head() %>% # look at the first six rows
+  pander( digit = 7
+          , caption = "Examining the 'data' slot within comarea606"
+          )
+```
+
+
+* `polygons`: contains more slots related to each individual polygon. For more information, please see [`?sp::Polygon-class`](https://www.rdocumentation.org/packages/sp/versions/1.2-5/topics/Polygon-class), [`?sp::SpatialPolygons`](https://www.rdocumentation.org/packages/sp/versions/1.2-5/topics/SpatialPolygons), and the [*Getting a slot's value of S4 objects?*](https://stackoverflow.com/questions/8708681/getting-a-slots-value-of-s4-objects) thread.
+    + `Polygons`: 
+        + `labpt`: Returns a numeric vector of length two, containing the coordinate pair of the [geometric center (also known as the centroid)](https://en.wikipedia.org/wiki/Centroid) of the individual Polygon.
+        + `area`: Not a reliable source of the area of the individual Polygon. To obtain that information, [`rgeos::gArea()`](https://www.rdocumentation.org/packages/rgeos/versions/0.3-26/topics/gAreaa) for layers with projected coordinate reference systems or [`geosphere::areaPolygon()`](https://www.rdocumentation.org/packages/geosphere/versions/1.5-5/topics/areaPolygon) for those in lat-long coordinate reference systems (i.e. [`CRS(+proj=longlat)`](https://www.rdocumentation.org/packages/sp/versions/1.2-5/topics/CRS-class) ). 
+        + `hole`: logical value for setting polygon as hole or not.
+        + `ringDir`: Object of class "integer"; the ring direction of the ring (polygon) coordinates, holes are expected to be anti-clockwise. 
+        + `coords`: Object of class "matrix"; coordinates of the polygon; first point should equal the last point.
+    + `plotOrder`: Object of class "integer"; order in which the Polygon objects should be plotted.
+    + `labpt`: Returns a numeric vector of length two, containing the coordinate pair of the [geometric center (also known as the centroid)](https://en.wikipedia.org/wiki/Centroid) of the individual Polygon. **Please note** that `slot( object = slot( object = comarea606, name = "polygons")[[1]], name = "labpt" )`, `comarea606@polygons[[1]]@labpt`, `slot( object = slot( object = slot( object = comarea606, name = "polygons")[[1]], name = "Polygons" )[[1]], name = "labpt" )`, and `comarea606@polygons[[1]]@Polygons[[1]]@labpt` are different commands which all return the exact same values.
+    + `ID`: Object of class "character"; unique identifier string.
+    + `area`: Not a reliable source of the area of the individual Polygon. To obtain that information, [`rgeos::gArea()`](https://www.rdocumentation.org/packages/rgeos/versions/0.3-26/topics/gAreaa) for layers with projected coordinate reference systems or [`geosphere::areaPolygon()`](https://www.rdocumentation.org/packages/geosphere/versions/1.5-5/topics/areaPolygon) for those in lat-long coordinate reference systems (i.e. [`CRS(+proj=longlat)`](https://www.rdocumentation.org/packages/sp/versions/1.2-5/topics/CRS-class) ).
+    
+* `plotOrder`: Object of class "integer"; order in which the Polygon objects should be plotted.
+
+* `bbox`: 2-column bounding box matrix holding the minimum in first and maximum in second column for the x-coordinate (first row), y-coordinate (second row).
+
+* `proj4string`: Object of class [`CRS`](); holding a valid proj4 string, which can be used for unprojecting or reprojecting coordinates.
+
+### More Resources
+
+* [`sp` documentation](https://www.rdocumentation.org/packages/sp/versions/1.2-5)
+
+* [PROJ.4 - Cartographic Projections Library](https://github.com/OSGeo/proj.4)
+
+* [GDAL - Geospatial Data Abstraction Library](http://www.gdal.org/)
+
+* [Jeffrey Evans'](http://evansmurphy.wixsite.com/evansspatial) comprehensive answer to better understand the [properties and operators of spatial data](https://gis.stackexchange.com/questions/87789/spatialpointsdataframe-properties-and-operators-in-r).
 
 # Points
 
 Points on a map represent longitudinal and latitudinal coordinates, a unique pair that specifies an address. 
-```{r, echo=FALSE}
+```{r SS of GMaps, echo=FALSE}
 # image packages
 library(png)
 library(grid)
 img <- readPNG("/Users/cristiannuno/Desktop/geocode_ex.png")
 grid.raster(img)
 ```
+
 *Image Courtesy of [Google Maps](https://www.google.com/permissions/using-product-graphics.html)*
 
 ## When Longitude and Latitude Are Not Given, You May Find Them by Geocoding
 
-In the event that coordinate pairs are not given in your data set, see if they have a `full_address` variable that is composed of street address, city, state, and zip code. If not, see if each of those is its own variable.
+I often use [www.latlong.net](https://www.latlong.net/) if I need geocode one or two addresses. For larger queries, I use the `geocode` function within the [`ggmap`](https://cran.r-project.org/web/packages/ggmap/ggmap.pdf) package.
 
-If you possess either a `full_address` variable or all four variables pasted together compose a full address, you may go onto to geocode the coordinates. This refers to looking up an address in a geo-database and returning the x-y (longitude-latitude) coordinates.
+The `geocode` function only asks for a full address - typically, street number, street address, city, state, and zip code - gives you back longitude and latitude pairs. 
 
-I often use [www.latlong.net](https://www.latlong.net/) if I need geocode one or two addresses. Besides that, I use the `geocode` function within the [`ggmap`](https://cran.r-project.org/web/packages/ggmap/ggmap.pdf) package.
-
-The `geocode` function only asks for a full address and - by default - gives you back longitude and latitude pairs.
+However, `ggmap` is not the only package around. To learn more, please see the article [*Geocoding in R*](https://cengel.github.io/rspatial/5_Geocoding.nb.html) written by Claudia A. Engel.
 
 ## Chicago Public School Points
 
@@ -154,7 +201,7 @@ New to colors? Briefly, R's color arguments - `col`, `bg`, `border` - can take i
 
 Personal favorite website is [www.htmlcolorcodes.com](http://htmlcolorcodes.com/) for their friendly immersion into the world of color.
 
-```{r, fig.align='center'}
+```{r Plot CPS SY1617, fig.align='center'}
 # clear margin space
 par( mar = c( 2, 0, 2, 0 )
      , bg = "#06369D" # cps blue
@@ -207,77 +254,62 @@ mtext( side = 1
 Can you identify which points (Chicago Public Schools) reside in which particular polygon (current community area)?
 
 
-# Identifying Points Inside Polygons
+# Labels Points Inside Polygons
 
-After reading the [R Filter Coordinates](https://stackoverflow.com/questions/17571602/r-filter-coordinates) post on Stack Overflow, I figured out a way to identify points inside polygons. *Therefore*, you can add the identified polygon as a column for each row, which would allow for the possibility of filtering points based on which polygons they reside in. 
+After reading the [R Filter Coordinates](https://stackoverflow.com/questions/17571602/r-filter-coordinates) post on Stack Overflow, the following demonstrates one way to label points inside polygons.
 
-## Import 'splancs' package
 
-Import the [`splancs`](https://cran.r-project.org/web/packages/splancs/splancs.pdf) package to conduct our spatial point pattern analysis
+## Create and Use the GetPolygonBoundaries() Function
 
-```{r ID Points inside Polygons}
-# import necessary packages
-suppressPackageStartupMessages( library( splancs ) )
+Create the `GetPolygonBoundaries()` function to access and store the boundaries of each polygon within the spatial data frame. Each boundary is a set of coordinate pairs.
+
+`GetPolygonBoundaries()` creates each matrix in order of each polygon's appearance in `slot( comarea606, "data")`, ensuring proper oder when using `comarea606$community` to label each matrix its corresponding community area name.
+
+```{r create GetPolygonBoundaries()}
+# start of GetPolygonBoundaries() function
+GetPolygonBoundaries <- function( a.spatial.df
+                                  , polygon.boundary.names
+                                  , label.polygon.boundaries = TRUE
+) {
+  
+  # ensure `sp` package in loaded
+  require( sp )
+  
+  # ensure input is correct class 
+  # prior to obtaining polygon boundary coordinates
+  if( class( a.spatial.df )[1] == "SpatialPolygonsDataFrame" ){
+    list.of.polygon.boundaries <- sapply( X = slot( object = a.spatial.df
+                                                    , name = "polygons"
+                                                    )
+                                          , FUN = function(i) sp::coordinates( obj = slot( object = i, name = "Polygons")[[1]] ) 
+                                          )
+  } else{
+    stop( "a.spatial.df is of class "
+          , class( a.spatial.df )[1]
+          , ". "
+          , "Please ensure it is of class SpatialPolygonsDataFrame. See ?sp::`SpatialPolygonsDataFrame-class` or the following documentation page for more help: https://www.rdocumentation.org/packages/sp/versions/1.2-5/topics/SpatialPolygonsDataFrame-class"
+    )
+  }
+
+  # assign names to the list.of.polygon.boundaries
+  # if label.polygon.boundaries is set to TRUE (default)
+  if( label.polygon.boundaries == TRUE ){
+    names( list.of.polygon.boundaries ) <-
+      as.character( x = polygon.boundary.names )
+  } 
+  
+  # return list.of.polygon.boundaries to the Global Environment
+  return( list.of.polygon.boundaries )
+  
+} # end of GetPolygonBoundaries() function
+
+# use GetPolygonBoundaries()
+comarea606.polygons <- GetPolygonBoundaries( a.spatial.df = comarea606
+                             , polygon.boundary.names = comarea606$community
+                             )
 ```
 
-## Create GetPolygonCoordinates() Function
-
-Create `GetPolygonCoordinates()` function to access coordinate values within multiple polygons inside a spatial data frame. 
-
-```{r}
-GetPolygonCoordinates <- function( a.spatial.df ) {
-  
-  # start counter
-  i <- 1
-  
-  # create empty list
-  empty.list <- list()
-  
-  # start while loop
-  while( nrow( a.spatial.df ) >= i ) {
-    
-    # fill the empty list with one set of coordinates
-    empty.list[[i]] <- a.spatial.df@polygons[[i]]@Polygons[[1]]@coords
-    
-    # add 1 to the counter
-    i <- i + 1
-    
-  } # end of while loop
-  
-  # return the empty.list to the Global Environment
-  return( empty.list )
-  
-} # end of GetPolygonCoordinates function
-```
-
-## Use GetPolygonCoordinates() Function
-
-Use the `GetPolygonCoordinates()` function to retrieve the coordinate values within the multiple polygons inside the `comarea606` spatial data frame (which represents the current community areas within the City).
-
-```{r}
-# use the `GetPolygonCoordinates` function
-# to retrieve all coordinate values that reside 
-# within each polygon
-comarea606.polygons <- GetPolygonCoordinates( comarea606 ) # list of 77 matrices
-```
-
-## Use Polygon Names to Label 77 Matrices
-
-Assign the list of names within the spatial data frame to the newly created list of 77 matrices, which contain the coordinate values within the multiple polygons inside the `comarea606` spatial data frame (which represents the current community areas within the City).
-
-Since `GetPolygonCoordinates()` creates each matrix in order of each polygon's appearance in `comarea606`, you can safely use the column `comarea606$community` to label each matrix its corresponding community area name.
-
-```{r}
-# `comarea606.polygons` is a list with 77 matrices
-# to label each matrix
-# use the `names` functions and assign its corresponding community area name
-# by calling the "community" variable
-# inside the `comarea606` spatial polygon data frame
-names( comarea606.polygons ) <- comarea606$community
-
-```
-
-## Create LabelPointsWithinPolygons() Function
+## Create and Use the LabelPointsWithinPolygons() Function
 
 Now to put it all together with a function that contains three arguments:
 
@@ -285,7 +317,7 @@ Now to put it all together with a function that contains three arguments:
 
 2. `Lat`: A vector of latitudinal points
 
-3. `a.list.of.coordinates`: A list of coordinates within every polygon from a spatial data frame
+3. `list.of.polygon.boundaries`: A list of coordinates pairs marking the boundaries for every polygon within a spatial data frame
 
 and returns a character vector of the the name of the polygon individual points reside in. 
 
@@ -298,13 +330,15 @@ The function has been updated to account for data frames which contain some lati
 
 The `splancs::inpip()` function returns a vector of indices of the points in `pts` which are located within the polygon in `poly`. The logical test here is to see which rows within the `df.lon.lat` data frame are within the vector of indices being returned by `splancs::inpip()`.
 
-#### Assuming a complete list of non-NA coordinate pairs
-At the moment, the following function assumes the data frame contains `longitude` and `latitude` pairs which do not contain a single NA value. 
 
-```{r}
+```{r create LabelPointsWithinPolygons()}
+# import necessary packages
+suppressPackageStartupMessages( library( splancs ) )
+
+# create LabelPointsWithinPolygons() function
 LabelPointsWithinPolygons <- function( Long
                                        , Lat
-                                       , a.list.of.coordinates ) {
+                                       , list.of.polygon.boundaries ) {
   # 1. Ensure necessary packages are imported
   require( splancs )
   
@@ -312,24 +346,21 @@ LabelPointsWithinPolygons <- function( Long
   # and assign it a value of NA. This variable will be used to
   # identify which coordinate pairs exist within which particular
   # polygons from a.spatial.df
-  polygon.label <- ifelse( test = identical( x = length( Long )
-                                       , y = length( Lat )
-                                       )
-                     , yes = rep( x = NA
-                                  , times = length( Long )
-                                  )
-                     , no = stop( paste( "Length of Long is", length( Long)
-                                         , "but the length of Lat is", length( Lat )
-                                         , ". Ensure the two are of equivalent lengths prior to executing the LabelPointsWithinPolygons() function."
-                                         )
-                                  )
-  )
+  if( identical( x = length( Long ), y = length( Lat ) ) ){
+    polygon.label <- rep( x = NA, times = length( Long ) )
+  } else{
+    stop( "Length of Long is"
+          , length( Long)
+          , "but the length of Lat is", length( Lat )
+          , ". Ensure the two are of equivalent lengths prior to executing the LabelPointsWithinPolygons() function."
+    )
+  } # end of else statement
   
   # 3. Start your counter
   i <- 1
   
   # 4. Start your while loop
-  while( length( a.list.of.coordinates ) >= i  ) {
+  while( length( list.of.polygon.boundaries ) >= i  ) {
     
     # 5. Create a coordinate pair data frame
     #    and ensure Long and Lat are both cast as numeric
@@ -346,21 +377,45 @@ LabelPointsWithinPolygons <- function( Long
     
     # 7. Test which coordinate pairs from df.lon.lat
     #    reside within the ith polygon 
-    #    inside of a.list.of.coordinates
-    
-    df.lon.lat$in.polygon <- 
+    #    inside of list.of.polygon.boundaries.
+    #    
+    #    Note: I'm choosing to set bound=FALSE,
+    #          declaring points which fall exactly on polygon boundaries
+    #          will not be assigned to any polygon.
+    #    Note: I'm building in an edge case where one of the coordinate pairs
+    #          are NA values. Come back becuase this is still wrong!
+    if( any( is.na( df.lon.lat$x ) | is.na( df.lon.lat$y ) ) == TRUE ){
       
-      1:nrow( df.lon.lat) %in%
-      inpip(
-        pts = df.lon.lat
-        , poly = a.list.of.coordinates[[i]]
-      ) 
+      # create filter condition
+      filter.condition <- which( !is.na( df.lon.lat$x ) & !is.na( df.lon.lat$y ) )
+      
+      # conduct test only on those Non NA coordinate pairs
+      non.na.in.polygon <- 
+        1:nrow( df.lon.lat[ filter.condition, ] ) %in%
+        inpip( pts = df.lon.lat[ filter.condition, ]
+               , poly = list.of.polygon.boundaries[[i]]
+               , bound = FALSE
+               )
+      
+      # place NA values in $in.polygon
+      df.lon.lat$in.polygon <- NA
+      
+      # replace df.on.lat$in.polygon values
+      # with non.na.in.polygon
+      # for those rows that meet the filter.condition
+      df.lon.lat$in.polygon[ filter.condition ] <- non.na.in.polygon
+    } else{
+      df.lon.lat$in.polygon <-
+        1:nrow( df.lon.lat ) %in%
+        inpip( pts = df.lon.lat
+               , poly = list.of.polygon.boundaries[[i]]
+               , bound = FALSE
+               )
+    } # end of else statement
     
     # 8. Logical test: Does at least one coordinate pairs reside within
-    #    this particular polygon (i.e. a.list.of.coordinates[[i]])?
+    #    this particular polygon (i.e. list.of.polygon.boundaries[[i]])?
     if( any( df.lon.lat$in.polygon ) == TRUE ) {
-      # since at least one coordinate pair within df.lon.lat
-      # resides within this particular polygon,
       # filter df.lon.lat to only include these pairs which
       # contain a TRUE value in their $in.polygon column.
       df.lon.lat <- 
@@ -373,14 +428,14 @@ LabelPointsWithinPolygons <- function( Long
       #        whose Lat values appear in df.lon.lat$y
       #
       #      * for these filtered elements, replace their NA values
-      #        with the name of the polygon within a.list.of.coordinates[[i]]
+      #        with the name of list.of.polygon.boundaries[i]
       polygon.label[ 
         which( Long %in% df.lon.lat$x &
                  Lat %in% df.lon.lat$y
                )
-        ] <- names( a.list.of.coordinates )[i]
+        ] <- names( list.of.polygon.boundaries )[i]
       
-      # 10. Move onto the next polygon with a list.of.coordinates
+      # 10. Move onto the next list.of.polygon.boundaries[[i]] element
       i <- i + 1
       
     } else{
@@ -389,7 +444,7 @@ LabelPointsWithinPolygons <- function( Long
       # does not reside within this particular polygon,
       # add one to counter 
       # and move onto the the next polygon
-      # within a.list.of.coordinates[[i]]
+      # within list.of.polygon.boundaries[[i]]
       i <- i + 1
       
     } # end of else statement
@@ -401,34 +456,25 @@ LabelPointsWithinPolygons <- function( Long
   return( polygon.label )
   
 } # end of LabelPointsWithinPolygons() function
-```
 
-## Use LabelPointsWithinPolygons() Function
-
-Run the `LabelPointsWithinPolygons()` function to assign points within the data frame the names of the polygon they reside in. Peak inside to make sure it worked.
-
-```{r, message=FALSE}
-# Run the `LabelPointsWithinPolygons()` function
+# Use the `LabelPointsWithinPolygons()` function
 cps.sy1617$Community_Area <- LabelPointsWithinPolygons( Long = cps.sy1617$School_Longitude
                                                         , Lat = cps.sy1617$School_Latitude
-                                      , a.list.of.coordinates = comarea606.polygons
+                                      , list.of.polygon.boundaries = comarea606.polygons
                             )
 
 # peak inside the data frame AFTER the transformation
-library( dplyr )
-library( magrittr )
-library( pander )
 cps.sy1617 %>% # call df
   select( Short_Name
           , School_Longitude
           , School_Latitude
-          , Community_Area ) %>% # select certain variables within the data frame
-  head() %>% # look at first six rows
+          , Community_Area ) %>%
+  head() %>% 
   pander( digit = 7
-          , caption = "Sample of Chicago Public Schools - School Profile Information SY1617")
-
-
+          , caption = "Sample of Chicago Public Schools - School Profile Information SY1617"
+          )
 ```
+
 
 ## Test Accuracy of LabelPointsWithinPolygons() Function
 
@@ -445,7 +491,7 @@ On the other hand, [Chicago Public Schools - School Profile Information SY1617](
 For the accuracy of the `LabelPointsWithinPolygons()` function, I will exclude those 9 schools which are not present in the more recent data set. I will also check and exclude any new schools which are not present in the older data set.
 
 
-```{r}
+```{r Import Comparison Data}
 # import CPS SY1617 location data
 cps.sy1617.location.url <- "https://data.cityofchicago.org/api/views/75e5-35kf/rows.csv?accessType=DOWNLOAD"
 
@@ -491,7 +537,7 @@ cps.sy1617$update_date <- as.Date( x = "2017-09-20" )
 
 ### Peak Inside Both Data Sets
 
-```{r}
+```{r Peak Inside Both Data Sets}
 # display a few rows and columns from older data set
 cps.sy1617.location %>% # call df
   select( update_date
@@ -517,9 +563,7 @@ cps.sy1617 %>% # call df
 
 To test the unique current community area objects for exact equality, I'll be using the `identical()` function. To my knowledge, there are no spelling mistakes in either data set. It is also important to note that both sets of current community area values are upper case.
 
-```{r}
-# test alphabetized unique Community Area objects
-# to ensure spelling is correct 
+```{r Test Identical Com Area Spelling}
 identical( x = sort( unique( cps.sy1617$Community_Area ) )
            , y = sort( unique( cps.sy1617.location$COMMAREA ) )
            )
@@ -531,9 +575,7 @@ The TRUE value lets us know that spelling will not be cause of any mismatches.
 
 Continuing to use the `identifical()` function, we now put `LabelPointsWithinPolygons()` to the test.
 
-```{r}
-# test Community Area objects between the two data sets
-# for exact equality
+```{r Test for Identicial Com Area Values}
 identical( x = cps.sy1617.location$COMMAREA
            , y = cps.sy1617$Community_Area
            )
@@ -541,7 +583,7 @@ identical( x = cps.sy1617.location$COMMAREA
 
 Why did the `identical()` test fail? Which schools were non-matches? Why were they non-matches? What went wrong with `LabelPointsWithinPolygons()`?
 
-```{r}
+```{r Exploring Failure}
 # store School_IDs of those CPS schools
 # which did not share the same Community Area value as that in the other data set
 non.identical <- cps.sy1617.location$School_ID[
@@ -625,7 +667,7 @@ Let's revisit the questions I asked when there was not an exact match between th
 
 After replacing L.E.A.R.N. - Excel Campus' incorrect coordinate pair with the correct pair, re-run `LabelPointsWithinPolygons()`.
 
-```{r}
+```{r Correct Incorrect Coord Pair Data}
 # replace the current Long data
 # for the L.E.A.R.N. - Excel Campus
 # with the correct Long data
@@ -643,7 +685,7 @@ cps.sy1617$School_Latitude[
 # Run the `LabelPointsWithinPolygons()` function
 cps.sy1617$Community_Area <- LabelPointsWithinPolygons( Long = cps.sy1617$School_Longitude
                                                         , Lat = cps.sy1617$School_Latitude
-                                      , a.list.of.coordinates = comarea606.polygons
+                                      , list.of.polygon.boundaries = comarea606.polygons
                             )
 # show the correction
 cps.sy1617 %>% # call df
@@ -669,7 +711,7 @@ Plot a new map of CPS schools that only reside in any of the three Community Are
 * South Lawndale
 * Washington Heights
 
-```{r, fig.align='center'}
+```{r Viz Certain Com Areas, fig.align='center'}
 # clear margin space
 par( mar = c( 2, 0, 2, 0 )
      , bg = "#06369D" # cps blue
@@ -797,34 +839,7 @@ Thank you for reading this tutorial. My name is Cristian E. Nuno and I am an asp
 
 ## Session Info
 
-```{r, eval=FALSE}
+```{r Session Info}
 # Print version information about R, the OS and attached or loaded packages.
 sessionInfo()
 ```
-
-R version 3.4.3 (2017-11-30)
-Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
-
-Matrix products: default
-BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
-LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
-
-locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-
-attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
-
-other attached packages:
-[1] bindrcpp_0.2    pander_0.6.1    magrittr_1.5    dplyr_0.7.4    
-[5] splancs_2.01-40 rgdal_1.2-15    sp_1.2-5       
-
-loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13     knitr_1.17       bindr_0.1        lattice_0.20-35 
- [5] R6_2.2.2         rlang_0.1.4      stringr_1.2.0    tools_3.4.2     
- [9] grid_3.4.2       htmltools_0.3.6  yaml_2.1.14      assertthat_0.2.0
-[13] digest_0.6.12    rprojroot_1.2    tibble_1.3.4     rsconnect_0.8.5 
-[17] glue_1.2.0       evaluate_0.10.1  rmarkdown_1.8    stringi_1.1.6   
-[21] compiler_3.4.2   backports_1.1.1  pkgconfig_2.0.1 
-

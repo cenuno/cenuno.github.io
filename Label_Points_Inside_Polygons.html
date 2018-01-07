@@ -11,7 +11,7 @@
 
 <meta name="author" content="Cristian Nuno" />
 
-<meta name="date" content="2018-01-06" />
+<meta name="date" content="2018-01-07" />
 
 <title>Label Points Inside Polygons</title>
 
@@ -367,7 +367,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Label Points Inside Polygons</h1>
 <h4 class="author"><em>Cristian Nuno</em></h4>
-<h4 class="date"><em>January 06, 2018</em></h4>
+<h4 class="date"><em>January 07, 2018</em></h4>
 
 </div>
 
@@ -388,24 +388,21 @@ div.tocify {
 <li><p><a href="https://cran.r-project.org/web/packages/splancs/index.html"><code>splancs</code></a>: spatial and space-time point pattern analysis.</p></li>
 <li><p><a href="https://cran.r-project.org/web/packages/rgdal/index.html"><code>rgdal</code></a>: Primarily used to create spatial data frames, using the <a href="http://www.gdal.org/">Geospatial Data Abstraction Library</a>.</p></li>
 </ul>
-<pre class="r"><code>install.packages( c( &quot;dplyr&quot;, &quot;magrittr&quot;, &quot;methods&quot;
-                     , &quot;pander&quot;, &quot;sp&quot;, &quot;splancs&quot;
-                     , &quot;rgdal&quot;, &quot;utils&quot;
+<pre class="r"><code>install.packages( c( &quot;dplyr&quot;, &quot;magrittr&quot;, &quot;pander&quot;
+                     , &quot;sp&quot;, &quot;splancs&quot;, &quot;rgdal&quot;
                      )
-                  )
-# two packages come pre-loaded: &quot;methods&quot; and &quot;utils&quot;</code></pre>
+                  )</code></pre>
 </div>
 </div>
 <div id="polygons" class="section level1">
 <h1>Polygons</h1>
-<p>Polygons on a map represent natural or artificial borders used to mark on space apart from another. In Chicago, a common series of polygons are the 77 Community Areas that make up the entire city.</p>
+<p>Polygons on a map represent natural or artificial borders used to mark on space apart from another. In Chicago, a common series of polygons are the 77 current community areas (CCAs) that make up the entire city.</p>
 <center>
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg/350px-Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg.png" />
 </center>
 <p><em>Image Courtesy of <a href="https://commons.wikimedia.org/wiki/File:Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg">Wiki Media Commons</a></em></p>
 <div id="importing-polygons-into-r" class="section level2">
 <h2>Importing Polygons into R</h2>
-<p>Fortunately, importing polygons into R is easy.</p>
 <p>The data for this tutorial comes from the <a href="https://data.cityofchicago.org/#about">City of Chicago’s Open Data Portal</a>:</p>
 <blockquote>
 <p>City of Chicago’s open data portal is a lets you find city data, find facts about your neighborhood, lets you create maps and graphs about the city, and lets you freely download the data for your own analysis. Many of these data sets are updated at least once a day, and many of them updated several times a day.</p>
@@ -416,9 +413,9 @@ div.tocify {
 <p>Boiled down, these are the general steps to importing:</p>
 <ol style="list-style-type: decimal">
 <li><p>Find polygon source, such as <a href="https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-current-/cauq-8yn6">City of Chicago’s current community area (cca) boundaries</a></p></li>
-<li><p>Export that source as a GeoJSON file - a java-based format that condenses the size of geographic information - by copying the link location. With the City’s data portal, go to “Export”, then hover the mouse under “GeoJSON”. Right-click and click on the phrase <a href="https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON">“Copy Link Location”</a>.</p></li>
+<li><p>Export that source as a GeoJSON file - <a href="http://geojson.org/">a java-based format that condenses the size of geographic information</a> - by copying the link location. With the City’s data portal, go to “Export”, then hover the mouse under “GeoJSON”. Right-click and click on the phrase <a href="https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON">“Copy Link Location”</a>.</p></li>
 <li><p>Save the copied link as a character vector in R</p></li>
-<li><p>Use the <a href="https://cran.r-project.org/web/packages/rgdal/rgdal.pdf"><code>rgdal</code></a> package to call that vector and transform it into a spatial data frame.</p></li>
+<li><p>Use the <a href="https://cran.r-project.org/web/packages/rgdal/rgdal.pdf"><code>rgdal::readOGR()</code></a> function to call that vector and transform it into a spatial data frame.</p></li>
 <li><p>The same steps apply when importing a <a href="https://en.wikipedia.org/wiki/Comma-separated_values">.CSV</a> file into R, expect substituting <code>rgdal::readOGR()</code> for <code>read.csv()</code>.</p></li>
 </ol>
 <p>See below for what this looks like in R.</p>
@@ -822,7 +819,7 @@ LabelPointsWithinPolygons &lt;- function( Long
     #          declaring points which fall exactly on polygon boundaries
     #          will not be assigned to any polygon.
     #    Note: I&#39;m building in an edge case where one of the coordinate pairs
-    #          are NA values. Come back becuase this is still wrong!
+    #          are NA values.
     if( any( is.na( df.lon.lat$x ) | is.na( df.lon.lat$y ) ) == TRUE ){
       
       # create filter condition
@@ -973,7 +970,7 @@ cps.sy1617 %&gt;% # call df
 <div id="test-accuracy-of-labelpointswithinpolygons-function" class="section level2">
 <h2>Test Accuracy of LabelPointsWithinPolygons() Function</h2>
 <p>Fortunately for us, the accuracy of the <code>LabelPointsWithinPolygons()</code> function can be tested thanks to the City of Chicago data portal.</p>
-<p><a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a> is a data set which hosts geographical boundary data for each CPS school for the 2016-2017 school year. Of the 15 columns it contains, one of them <code>commarea</code> for the current community area each particular school resides in.</p>
+<p><a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a> is a data set which hosts geographical boundary data for each CPS school for the 2016-2017 school year. Of the 15 columns it contains, the column <code>COMMAREA</code> marks the current community area each particular school resides in within the city.</p>
 <div id="account-for-school-closures-and-school-opening" class="section level3">
 <h3>Account for School Closures and School Opening</h3>
 <p>Unfortunately, schools close more frequently than anyone would like to imagine. <a href="https://data.cityofchicago.org/Education/Chicago-Public-Schools-School-Locations-SY1617/9zky-nrsy">Chicago Public Schools - School Locations SY1617</a> was updated on August 31, 2016. It contains 670 records for 670 schools which were presumably open at the time of the update.</p>
@@ -1024,14 +1021,14 @@ cps.sy1617$update_date &lt;- as.Date( x = &quot;2017-09-20&quot; )</code></pre>
 <div id="peak-inside-both-data-sets" class="section level3">
 <h3>Peak Inside Both Data Sets</h3>
 <pre class="r"><code># display a few rows and columns from older data set
-cps.sy1617.location %&gt;% # call df
+cps.sy1617.location %&gt;%
   select( update_date
               , Short_Name
               , School_ID
-              , COMMAREA ) %&gt;% # select certain columns
-  head() %&gt;% # show only first six rows
+              , COMMAREA ) %&gt;%
+  head() %&gt;%
   pander( digits = 6
-          , caption = &quot;Sample of CPS Locations SY1617 - August 31, 2016&quot;) # Prints an R object in Pandoc&#39;s markdown, allow for more digits to be shown to the user</code></pre>
+          , caption = &quot;Sample of CPS Locations SY1617 - August 31, 2016&quot;)</code></pre>
 <table>
 <caption>Sample of CPS Locations SY1617 - August 31, 2016</caption>
 <colgroup>
@@ -1092,10 +1089,10 @@ cps.sy1617 %&gt;% # call df
   select( update_date
               , Short_Name
               , School_ID
-              , Community_Area ) %&gt;% # select certain columns
-  head() %&gt;% # show only first six rows
+              , Community_Area ) %&gt;%
+  head() %&gt;%
   pander( digits = 6
-          , caption = &quot;Sample of CPS Locations SY1617 - September 20, 2017&quot;) # Prints an R object in Pandoc&#39;s markdown, allow for more digits to be show</code></pre>
+          , caption = &quot;Sample of CPS Locations SY1617 - September 20, 2017&quot;)</code></pre>
 <table>
 <caption>Sample of CPS Locations SY1617 - September 20, 2017</caption>
 <colgroup>
@@ -1177,7 +1174,7 @@ non.identical &lt;- cps.sy1617.location$School_ID[
 
 # display non identical Community Area values from older data set
 cps.sy1617.location %&gt;% # call df
-  filter( School_ID %in% non.identical ) %&gt;% # Only include those School_IDs which appear in the non.identical vector
+  filter( School_ID %in% non.identical ) %&gt;%
   select( update_date
           , Short_Name
           , School_ID
@@ -1185,9 +1182,9 @@ cps.sy1617.location %&gt;% # call df
           , Address
           , Long
           , Lat
-          ) %&gt;% # select a few columns
+          ) %&gt;%
   pander( digits = 7
-          , caption = &quot;CPS Schools with Non-match Community Areas - August 31, 2016&quot;) # Prints an R object in Pandoc&#39;s markdown, allow for more digits to be show</code></pre>
+          , caption = &quot;CPS Schools with Non-match Community Areas - August 31, 2016&quot;) </code></pre>
 <table>
 <caption>CPS Schools with Non-match Community Areas - August 31, 2016 (continued below)</caption>
 <colgroup>
@@ -1257,7 +1254,7 @@ cps.sy1617.location %&gt;% # call df
 </tbody>
 </table>
 <pre class="r"><code># display non identical Community Area values from newer data set
-cps.sy1617 %&gt;% # call df 
+cps.sy1617 %&gt;% 
   filter( School_ID %in% non.identical ) %&gt;% # Only include those School_IDs which appear in the non.identical vector
   select( update_date
           , Short_Name
@@ -1266,9 +1263,9 @@ cps.sy1617 %&gt;% # call df
           , Address
           , School_Longitude
           , School_Latitude
-          ) %&gt;% # select a few columns
+          ) %&gt;%
   pander( digits = 7
-          , caption = &quot;CPS Schools with Non-match Community Areas - September 20, 2017&quot;) # # Prints an R object in Pandoc&#39;s markdown, allow for more digits to be show</code></pre>
+          , caption = &quot;CPS Schools with Non-match Community Areas - September 20, 2017&quot;)</code></pre>
 <table>
 <caption>CPS Schools with Non-match Community Areas - September 20, 2017 (continued below)</caption>
 <colgroup>
@@ -1402,8 +1399,8 @@ cps.sy1617$Community_Area &lt;- LabelPointsWithinPolygons( Long = cps.sy1617$Sch
                                       , list.of.polygon.boundaries = comarea606.polygons
                             )
 # show the correction
-cps.sy1617 %&gt;% # call df
-  filter( cps.sy1617$Long_Name == &quot;L.E.A.R.N. - Excel Campus&quot; ) %&gt;% # only include one school
+cps.sy1617 %&gt;%
+  filter( cps.sy1617$Long_Name == &quot;L.E.A.R.N. - Excel Campus&quot; ) %&gt;%
   select( update_date
           , Short_Name
           , School_ID
@@ -1411,7 +1408,7 @@ cps.sy1617 %&gt;% # call df
           , Address
           , School_Longitude
           , School_Latitude
-          ) %&gt;% # select certain variables
+          ) %&gt;%
   pander( digit = 7
           , caption = &quot;Correct L.E.A.RN. - Excel Campus Community Area&quot; )</code></pre>
 <table style="width:86%;">
@@ -1536,10 +1533,10 @@ points( x = cps.sy1617$School_Longitude[ cps.sy1617$Community_Area ==
         , col = rgb( red = 249
                      , green = 245
                      , blue = 97
-                     , alpha = 100 # add some transparency
+                     , alpha = 100
                      , maxColorValue = 255
-                     ) # bright yellow
-        , pch = 20 # for more information on point type, look at ?par
+                     )
+        , pch = 20
           )
 
 # add the points for South Lawndale
@@ -1552,10 +1549,10 @@ points( x = cps.sy1617$School_Longitude[ cps.sy1617$Community_Area ==
         , col = rgb( red = 249
                      , green = 245
                      , blue = 97
-                     , alpha = 100 # add some transparency
+                     , alpha = 100
                      , maxColorValue = 255
-                     ) # bright yellow
-        , pch = 20 # for more information on point type, look at ?par
+                     )
+        , pch = 20
           )
 
 # add the points for Washington Heights
@@ -1568,10 +1565,10 @@ points( x = cps.sy1617$School_Longitude[ cps.sy1617$Community_Area ==
         , col = rgb( red = 249
                      , green = 245
                      , blue = 97
-                     , alpha = 100 # add some transparency
+                     , alpha = 100
                      , maxColorValue = 255
-                     ) # bright yellow
-        , pch = 20 # for more information on point type, look at ?par
+                     )
+        , pch = 20
           )
 
 # add data source

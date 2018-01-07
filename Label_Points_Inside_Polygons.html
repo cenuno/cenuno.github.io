@@ -775,8 +775,13 @@ suppressPackageStartupMessages( library( splancs ) )
 LabelPointsWithinPolygons &lt;- function( Long
                                        , Lat
                                        , list.of.polygon.boundaries ) {
-  # 1. Ensure necessary packages are imported
+  # 1. Ensure necessary packages are imported and
+  #    ensure that the names( list.of.polygon.boundaries ) is not null
   require( splancs )
+  
+  if( is.null( names( list.of.polygon.boundaries ) ) ){
+    stop( &quot;No names have been assigned to the matrices within the object list.of.polygon.boundaries. Please assign the matrices within that list a set of character names.&quot;)
+  }
   
   # 2. Create &#39;polygon.label&#39; vector
   # and assign it a value of NA. This variable will be used to
@@ -820,7 +825,7 @@ LabelPointsWithinPolygons &lt;- function( Long
     #          will not be assigned to any polygon.
     #    Note: I&#39;m building in an edge case where one of the coordinate pairs
     #          are NA values.
-    if( any( is.na( df.lon.lat$x ) | is.na( df.lon.lat$y ) ) == TRUE ){
+    if( any( is.na( df.lon.lat$x ) | is.na( df.lon.lat$y ) ) ){
       
       # create filter condition
       filter.condition &lt;- which( !is.na( df.lon.lat$x ) &amp; !is.na( df.lon.lat$y ) )
@@ -831,7 +836,7 @@ LabelPointsWithinPolygons &lt;- function( Long
         inpip( pts = df.lon.lat[ filter.condition, ]
                , poly = list.of.polygon.boundaries[[i]]
                , bound = FALSE
-               )
+        )
       
       # place NA values in $in.polygon
       df.lon.lat$in.polygon &lt;- NA
@@ -846,12 +851,14 @@ LabelPointsWithinPolygons &lt;- function( Long
         inpip( pts = df.lon.lat
                , poly = list.of.polygon.boundaries[[i]]
                , bound = FALSE
-               )
+        )
     } # end of else statement
     
     # 8. Logical test: Does at least one coordinate pairs reside within
     #    this particular polygon (i.e. list.of.polygon.boundaries[[i]])?
-    if( any( df.lon.lat$in.polygon ) == TRUE ) {
+    #    AND
+    #    is
+    if( any( df.lon.lat$in.polygon , na.rm = TRUE ) ) {
       # filter df.lon.lat to only include these pairs which
       # contain a TRUE value in their $in.polygon column.
       df.lon.lat &lt;- 
@@ -868,7 +875,7 @@ LabelPointsWithinPolygons &lt;- function( Long
       polygon.label[ 
         which( Long %in% df.lon.lat$x &amp;
                  Lat %in% df.lon.lat$y
-               )
+        )
         ] &lt;- names( list.of.polygon.boundaries )[i]
       
       # 10. Move onto the next list.of.polygon.boundaries[[i]] element

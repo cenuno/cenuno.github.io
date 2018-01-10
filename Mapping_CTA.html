@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Cristian Nuno" />
+
+<meta name="date" content="2018-01-09" />
+
+<title>Mapping Public Transportation in Chicago</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 66px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+
+.section h2 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+.section h3 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+.section h4 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+.section h5 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+.section h6 {
+  padding-top: 71px;
+  margin-top: -71px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Urban Data Science</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-file-code-o fa-lg"></span>
+     
+    Tutorials
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">R</li>
+    <li>
+      <a href="Label_Points_Inside_Polygons.html">Label Points Inside Polygons</a>
+    </li>
+    <li>
+      <a href="choropleth_map.html">Make a Choropleth Map</a>
+    </li>
+    <li>
+      <a href="distance_coord_pairs.html">Highlight Points Inside a Certain Radius</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="about.html">
+    <span class="fa fa-info fa-lg"></span>
+     
+    About
+  </a>
+</li>
+<li>
+  <a href="disclaimer.html">
+    <span class="fa fa-file-text fa-lg"></span>
+     
+    Disclaimer
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/cenuno">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://stackoverflow.com/users/7954106/aspiringurbandatascientist">
+    <span class="fa fa-stack-overflow fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://www.linkedin.com/in/cristiannuno">
+    <span class="fa fa-linkedin fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="mailto:nuno.e.cristian@gmail.com">
+    <span class="fa fa-envelope fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Mapping Public Transportation in Chicago</h1>
+<h4 class="author"><em>Cristian Nuno</em></h4>
+<h4 class="date"><em>January 09, 2018</em></h4>
+
+</div>
+
+
+<p><base target="_top"/></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This tutorial explains the process of unzipping <code>.kmz</code> files, importing <code>.kml</code> files using the <code>readOGR()</code> function from the <a href="https://cran.r-project.org/web/packages/rgdal/index.html"><code>rgdal</code></a> package to add Chicago Transportation Authority (CTA) ‘L’ train lines and bus routes to a map of the City of Chicago.</p>
+<div id="necessary-packages" class="section level2">
+<h2>Necessary Packages</h2>
+<p>To follow the tutorial, you’ll need to install the following <a href="https://www.statmethods.net/interface/packages.html">packages installed</a>:</p>
+<ul>
+<li><p><a href="https://cran.r-project.org/web/packages/sp/index.html"><code>sp</code></a>: classes and methods for spatial data.</p></li>
+<li><p><a href="https://cran.r-project.org/web/packages/rgdal/index.html"><code>rgdal</code></a>: Primarily used to create spatial data frames, using the <a href="http://www.gdal.org/">Geospatial Data Abstraction Library</a>.</p></li>
+</ul>
+<pre class="r"><code>install.packages( c( &quot;sp&quot;,  &quot;rgdal&quot; ) )</code></pre>
+</div>
+</div>
+<div id="cta-open-data" class="section level1">
+<h1>CTA Open Data</h1>
+<p>The <a href="https://data.cityofchicago.org/">City of Chicago Open Data Portal</a> contains a list of publically available datasets from the <a href="http://www.transitchicago.com/data/">Chicago Transportation Authority (CTA)</a>.</p>
+<p>We’ll import the five following datasets:</p>
+<ul>
+<li><p><strong>CSV</strong> file of <a href="https://data.cityofchicago.org/Transportation/CTA-System-Information-List-of-L-Stops/8pix-ypme">CTA System Information - List of ‘L’ Stops</a>: This list of ‘L’ stops provides location and basic service availability information for each place on the CTA system where a train stops, along with formal station names and stop descriptions.</p></li>
+<li><p><strong>KML</strong> file of <a href="https://data.cityofchicago.org/Transportation/CTA-L-Rail-Lines-kml/sgbp-qafc">CTA ‘L’ (Rail) Lines</a>: Lines representing approximately where the CTA rail lines are.</p></li>
+<li><p><strong>KML</strong> file of <a href="https://data.cityofchicago.org/Transportation/CTA-L-Rail-Stations-kml/4qtv-9w43">CTA ‘L’ (Rail) Stations</a>: Point data representing approximate location of Station head house. (Not necessarily where an entrance to station would be.)</p></li>
+<li><p><strong>KML</strong> file of <a href="https://data.cityofchicago.org/Transportation/CTA-Bus-Stops-kml/84eu-buny">CTA Bus Stops</a>: Point data representing over 11,000 CTA bus stops. The Stop ID is used to get Bus Tracker information.</p></li>
+<li><p><strong>KML</strong> file of <a href="https://data.cityofchicago.org/Transportation/CTA-Bus-Routes-kml/rytz-fq6y">CTA Bus Routes</a>: Line data representing CTA Bus Routes. Source data are NAVTEQ street centerlines.</p></li>
+</ul>
+</div>
+<div id="import-csv-into-r" class="section level1">
+<h1>Import CSV into R</h1>
+<p>To import a CSV file into R, from the City of Chicago Open Data Portal, you’ll do the following:</p>
+<ol style="list-style-type: decimal">
+<li><p>Click the <code>Download</code> Button on the top-right of the webpage.</p></li>
+<li><p>Hover your mouse on <code>CSV</code>, right-click, and click on the <code>Copy Link Address</code> button.</p></li>
+</ol>
+<p><img src='https://github.com/cenuno/cenuno.github.io/raw/master/Mapping_CTA_files/figure-html/Import_CSV_into_R.png' style='margin:0px auto; display:block; width: 100%' class='center'<image/> <em>Image couresy of City of Chicago</em></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Store the link as a character vector to be used in <code>file</code> argument inside the <code>read.csv()</code> function, while setting <code>header</code> equal to TRUE and <code>stringsAsFactors</code> equal to FALSE.</li>
+</ol>
+<pre class="r"><code># List of L stops
+ctaLinfo &lt;- read.csv( file = &quot;https://data.cityofchicago.org/api/views/8pix-ypme/rows.csv?accessType=DOWNLOAD&quot;
+                      , header = TRUE
+                      , stringsAsFactors = FALSE
+                      )</code></pre>
+</div>
+<div id="welcome-to-kmz" class="section level1">
+<h1>Welcome to KMZ</h1>
+<p>KMZ files are <a href="https://developers.google.com/kml/documentation/kmzarchives?csw=1">zipped KML (Keyhole Markup Language)</a> files with a .kmz extension. The contents of a KMZ file are a single root KML document, which is commonly expressed as “doc.kml”. The line and point data regarding CTA ‘L’ trains and buses is stored as a KMZ, requiring us to unzip the file prior to using the KML file inside.</p>
+<div id="import-kmz-into-r" class="section level2">
+<h2>Import KMZ into R</h2>
+<p>To import a KMZ file into R, from the City of Chicago Open Data Portal, you’ll do the following:</p>
+<ol style="list-style-type: decimal">
+<li>Hover your mouse on <code>Download</code>, right-click, and click on the <code>Copy the Link Address</code> button.</li>
+</ol>
+<p><img src='https://github.com/cenuno/cenuno.github.io/raw/master/Mapping_CTA_files/figure-html/Import_KML_Into_R.png' style='margin:0px auto; display:block; width: 100%' class='center'<image/> <em>Image couresy of City of Chicago</em></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Paste the link into the <code>url</code> argument inside the <code>download.file()</code> function. Be sure to name the zip file with the <code>destfile</code> argument. You’ll reuse that exact same character string when unzipping the file. However, you’ll always be extracting the <code>“doc.kml”</code> file that resides inside the unzipped KMZ file.</li>
+</ol>
+</div>
+<div id="working-directory-matters" class="section level2">
+<h2>Working Directory Matters</h2>
+<p>I’ll be downloading the zip file into my current working directory. If you’d like to place it elsewhere, please use the <code>setwd()</code> function to declare your preferred working directory to store the downloaded files.</p>
+<pre class="r"><code># optional
+# setwd( dir = &quot;/your/preferred/wd/filepath&quot;)
+library( sp )
+library( rgdal )
+
+###############################
+# download CTA &#39;L&#39; Rail Lines #
+###############################
+download.file( url = &quot;https://data.cityofchicago.org/download/sgbp-qafc/application%2Fzip&quot;
+               , destfile = &quot;CTA_RailLines.zip&quot;
+               )
+# unzip file
+unzip( &quot;CTA_RailLines.zip&quot;)
+
+# read data
+ctaLines &lt;- readOGR( dsn = paste( getwd()
+                                  , &quot;doc.kml&quot;
+                                  , sep = &quot;/&quot;
+                                  )
+                , stringsAsFactors = FALSE
+                )
+##################################
+# download CTA &#39;L&#39; Rail Stations #
+##################################
+download.file( url = &quot;https://data.cityofchicago.org/download/4qtv-9w43/application%2Fzip&quot;
+               , destfile = &quot;CTA_RailStations.zip&quot;
+               )
+# unzip file
+unzip( &quot;CTA_RailStations.zip&quot;)
+
+# read data
+ctaLineStations &lt;- readOGR( dsn = paste( getwd()
+                                  , &quot;doc.kml&quot;
+                                  , sep = &quot;/&quot;
+                                  )
+                , stringsAsFactors = FALSE
+                )
+###############################
+# download CTA Bus Routes #####
+###############################
+download.file( url = &quot;https://data.cityofchicago.org/download/rytz-fq6y/application%2Fzip&quot;
+               , destfile = &quot;CTA_ROUTES.zip&quot;
+               )
+
+# unzip file
+unzip( &quot;CTA_ROUTES.zip&quot;)
+
+# read data
+ctaBusRoutes &lt;- readOGR( dsn = paste( getwd()
+                                  , &quot;doc.kml&quot;
+                                  , sep = &quot;/&quot;
+                                  )
+                , stringsAsFactors = FALSE
+                )
+###############################
+# download CTA Bus Stops ######
+###############################
+download.file( url = &quot;https://data.cityofchicago.org/download/84eu-buny/application%2Fzip&quot;
+               , destfile = &quot;CTA_BusStops.zip&quot;)
+
+# unzip file
+unzip( &quot;CTA_BusStops.zip&quot; )
+
+# read data
+ctaBusStations &lt;- readOGR( dsn = paste( getwd()
+                                  , &quot;doc.kml&quot;
+                                  , sep = &quot;/&quot;
+                                  )
+                , stringsAsFactors = FALSE
+                )
+
+########################################
+# Import Community Areas as Background #
+########################################
+# store Chicago current community area
+# GeoJSON URL as a character vector
+geojson_comarea_url &lt;- &quot;https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON&quot;
+
+# transform URL character vector into spatial dataframe
+comarea606 &lt;- readOGR( dsn = geojson_comarea_url
+                       , layer = &quot;OGRGeoJSON&quot;
+                       , stringsAsFactors = FALSE
+                       , verbose = FALSE # to hide progress message after object is created
+)</code></pre>
+</div>
+</div>
+<div id="plotting-functions" class="section level1">
+<h1>Plotting Functions</h1>
+<p>Plotting the CTA requires the use of four functions, in order of appearance:</p>
+<ul>
+<li><p><a href="https://www.rdocumentation.org/packages/grDevices/versions/3.4.3/topics/pdf"><code>pdf</code></a>: pdf starts the graphics device driver for producing PDF graphics.</p></li>
+<li><p><a href="https://www.rdocumentation.org/packages/graphics/versions/3.4.3/topics/par"><code>par</code></a>: used to minimize the white space on the plot, as well as declaring a dark background color.</p></li>
+<li><p><a href="https://www.rdocumentation.org/packages/graphics/versions/3.4.3/topics/plot"><code>plot</code></a>: used to display the <a href="https://www.rdocumentation.org/packages/sp/versions/1.2-5/topics/SpatialPolygonsDataFrame-class">spatial polygons data frame</a>. This script “hides” the borders of the City of Chicago Community Areas by filling the polygons with the same color as the borders.</p></li>
+<li><p><a href="https://stat.ethz.ch/R-manual/R-devel/library/graphics/html/lines.html"><code>lines</code></a>: used to display the <a href="https://www.rdocumentation.org/packages/sp/versions/1.2-6/topics/SpatialLines-class">spatial lines data frame</a> of the CTA ‘L’ rail lines.</p></li>
+<li><p><a href="https://stat.ethz.ch/R-manual/R-devel/library/graphics/html/points.html"><code>points</code></a>: used to display the <a href="https://www.rdocumentation.org/packages/sp/versions/1.2-6/topics/SpatialPoints-class">spatial points data frame</a> of the CTA ‘L’ rail line stations.</p></li>
+<li><p><a href="https://www.rdocumentation.org/packages/grDevices/versions/3.4.3/topics/dev"><code>dev.off</code></a>: shuts down the specified (by default the current) device.</p></li>
+</ul>
+</div>
+<div id="plot-cta-train-routes" class="section level1">
+<h1>Plot CTA Train Routes</h1>
+<p><img src='https://github.com/cenuno/cenuno.github.io/raw/master/Mapping_CTA_files/figure-html/CTA_L_RailLines_Stations_2017-08-19.png' style='margin:0px auto; display:block; width: 80%' class='center'<image/></p>
+<pre class="r"><code># save as pdf
+pdf( file = &quot;CTA_L_RailLines_Stations_2017-08-19.pdf&quot;
+     , width = 8
+     , height = 11
+     )
+# clear margin white space
+par( mar = c(0, 0, 4, 0 )
+     , bg = &quot;#000000&quot;
+     )
+# plot community areas
+plot( comarea606
+      #, main = &quot;City of Chicago 77 Community Areas&quot;
+      , col = &quot;#B3DDF2&quot;
+      , border = &quot;#B3DDF2&quot;
+      )
+
+# add Blue Line
+lines( ctaLines[ ctaLines$Name == &quot;Blue Line (Forest Park)&quot; |
+                   ctaLines$Name == &quot;Blue Line (O&#39;Hare)&quot;
+                 , ]
+       , col = &quot;#00A1DE&quot;
+       , lwd = 10 # make line thicker
+       )
+
+# plot Red Line
+lines( ctaLines[ ctaLines$Name == &quot;Red, Purple Line&quot; |
+                   ctaLines$Name == &quot;Brown, Purple (Express), Red&quot; |
+                   ctaLines$Name == &quot;Red Line&quot;
+                 , ]
+       , col = &quot;#C60C30&quot;
+       , lwd = 10
+       )
+# plot Green Line
+lines( ctaLines[ ctaLines$Name == &quot;Green, Pink&quot; |
+                   ctaLines$Name == &quot;Green Line&quot; |
+                   ctaLines$Name == &quot;Green, Orange&quot; |
+                   ctaLines$Name == &quot;Brown, Green, Orange, Pink, Purple (Exp)&quot;
+                 , ]
+       , col = &quot;#009B3A&quot;
+       , lwd = 8
+       )
+# plot Yellow Line
+lines( ctaLines[ ctaLines$Name == &quot;Yellow Line&quot;
+                 , ]
+       , col = &quot;#F9E300&quot;
+       , lwd = 10
+       )
+# plot Purple Line
+lines( ctaLines[ ctaLines$Name == &quot;Red, Purple Line&quot; |
+                   ctaLines$Name == &quot;Brown, Purple (Express), Red&quot; |
+                   ctaLines$Name == &quot;Brown, Green, Orange, Pink, Purple (Exp)&quot; |
+                   ctaLines$Name == &quot;Purple Line&quot; |
+                   ctaLines$Name == &quot;Brown, Purple&quot; |
+                   ctaLines$Name == &quot;Brown, Orange, Pink, Purple (Express)&quot;
+                 , ]
+       , col = &quot;#522398&quot;
+       , lwd = 10
+       )
+# plot Orange Line
+lines( ctaLines[ ctaLines$Name == &quot;Brown, Green, Orange, Pink, Purple (Exp)&quot; |
+                   ctaLines$Name == &quot;Brown, Orange, Pink, Purple (Express)&quot; |
+                   ctaLines$Name == &quot;Green, Orange&quot; |
+                   ctaLines$Name == &quot;Orange Line&quot;
+                   , ]
+       , col = &quot;#F9461C&quot;
+       , lwd = 10
+       )
+# plot Brown Line
+lines( ctaLines[ ctaLines$Name == &quot;Brown, Purple (Express), Red&quot; |
+                   ctaLines$Name == &quot;Brown, Green, Orange, Pink, Purple (Exp)&quot; |
+                   ctaLines$Name == &quot;Brown, Purple&quot; |
+                   ctaLines$Name == &quot;Brown, Orange, Pink, Purple (Express)&quot; |
+                   ctaLines$Name == &quot;Brown Line&quot;
+                 , ]
+       , col = &quot;#62361B&quot;
+       , lwd = 10
+       )
+# plot Pink Line
+lines( ctaLines[ ctaLines$Name == &quot;Brown, Green, Orange, Pink, Purple (Exp)&quot; |
+                   ctaLines$Name == &quot;Brown, Orange, Pink, Purple (Express)&quot; |
+                   ctaLines$Name == &quot;Green, Pink&quot; |
+                   ctaLines$Name == &quot;Pink Line&quot;
+                   , ]
+       , col = &quot;#E27EA6&quot;
+       , lwd = 10
+       )
+# add CTA &#39;L&#39; Station points
+points( ctaLineStations
+        , col = &quot;#FFFFFF&quot;
+        , pch = 20
+        , cex = 1
+        )
+# shut down graphing device
+dev.off()</code></pre>
+</div>
+<div id="plot-cta-bus-routes" class="section level1">
+<h1>Plot CTA Bus Routes</h1>
+<p><img src='https://github.com/cenuno/cenuno.github.io/raw/master/Mapping_CTA_files/figure-html/CTA_Bus_Routes_Stops_2017-08-19.png' style='margin:0px auto; display:block; width: 80%' class='center'<image/></p>
+<pre class="r"><code># save as PDF
+pdf( file = &quot;CTA_Bus_Routes_Stops_2017-08-19.pdf&quot;
+     , width = 9
+     , height = 12
+     )
+# clear margin white space
+par( mar = c(0, 0, 4, 0 )
+     , bg = &quot;#000000&quot;
+     )
+# plot community areas
+plot( comarea606
+      #, main = &quot;City of Chicago 77 Community Areas&quot;
+      , col = &quot;#B3DDF2&quot;
+      , border = &quot;#B3DDF2&quot;
+      )
+# add CTA Bus Routes
+lines( ctaBusRoutes
+       , col = &quot;#FFFFFF&quot;
+       , lwd = 4
+       )
+# add CTA Bus Stops
+points( ctaBusStations
+        , col = &quot;#FF0000&quot;
+        , pch = 20
+        , cex = 0.6
+        )
+# turn graphic device off
+dev.off()</code></pre>
+</div>
+<div id="about-me" class="section level1">
+<h1>About Me</h1>
+<p>Thank you for reading this tutorial. My name is Cristian E. Nuno and I am an aspiring data scientist. To see more of my work, please visit my professional portfolio <a href="https://cenuno.github.io/"><em>Urban Data Science</em></a>.</p>
+<div id="session-info" class="section level2">
+<h2>Session Info</h2>
+<pre class="r"><code># Print version information about R, the OS and attached or loaded packages.
+sessionInfo()</code></pre>
+<pre><code>## R version 3.4.3 (2017-11-30)
+## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+## Running under: macOS Sierra 10.12.6
+## 
+## Matrix products: default
+## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## loaded via a namespace (and not attached):
+##  [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+##  [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+##  [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      stringr_1.2.0  
+## [13] digest_0.6.13   evaluate_0.10.1</code></pre>
+</div>
+</div>
+
+<br>
+<span style="color:#CCCCCC">Copyright &copy; 2017 - 2018. Urban Data Science. Email me at <a href='mailto:nuno.e.cristian@gmail.com'>nuno DOT e DOT cristian AT gmail DOT com</a>. All rights reserved. See Disclaimer for further details.</span>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

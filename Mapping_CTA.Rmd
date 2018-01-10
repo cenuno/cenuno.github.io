@@ -1,0 +1,336 @@
+---
+title: "Mapping Public Transportation in Chicago"
+author: "Cristian Nuno"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  html_document:
+    theme: readable
+    toc: TRUE
+    toc_float: TRUE
+    code_folding: hide
+---
+<base target="_top"/>
+
+# Introduction
+
+This tutorial explains the process of unzipping `.kmz` files, importing `.kml` files using the `readOGR()` function from the [`rgdal`](https://cran.r-project.org/web/packages/rgdal/index.html) package to add Chicago Transportation Authority (CTA) ‘L’ train lines and bus routes to a map of the City of Chicago.
+
+
+## Necessary Packages
+
+To follow the tutorial, you'll need to install the following [packages installed](https://www.statmethods.net/interface/packages.html):
+
+* [`sp`](https://cran.r-project.org/web/packages/sp/index.html): classes and methods for spatial data.
+
+* [`rgdal`](https://cran.r-project.org/web/packages/rgdal/index.html): Primarily used to create spatial data frames, using the [Geospatial Data Abstraction Library](http://www.gdal.org/).
+
+```{r Install Packages, eval = FALSE}
+install.packages( c( "sp",  "rgdal" ) )
+```
+
+
+# CTA Open Data
+
+The [City of Chicago Open Data Portal](https://data.cityofchicago.org/) contains a list of publically available datasets from the [Chicago Transportation Authority (CTA)](http://www.transitchicago.com/data/).
+
+We’ll import the five following datasets:
+
+* **CSV** file of [CTA System Information - List of ‘L’ Stops](https://data.cityofchicago.org/Transportation/CTA-System-Information-List-of-L-Stops/8pix-ypme): This list of ‘L’ stops provides location and basic service availability information for each place on the CTA system where a train stops, along with formal station names and stop descriptions.
+
+* **KML** file of [CTA ‘L’ (Rail) Lines](https://data.cityofchicago.org/Transportation/CTA-L-Rail-Lines-kml/sgbp-qafc): Lines representing approximately where the CTA rail lines are.
+
+* **KML** file of [CTA ‘L’ (Rail) Stations](https://data.cityofchicago.org/Transportation/CTA-L-Rail-Stations-kml/4qtv-9w43): Point data representing approximate location of Station head house. (Not necessarily where an entrance to station would be.)
+
+* **KML** file of [CTA Bus Stops](https://data.cityofchicago.org/Transportation/CTA-Bus-Stops-kml/84eu-buny): Point data representing over 11,000 CTA bus stops. The Stop ID is used to get Bus Tracker information.
+
+* **KML** file of [CTA Bus Routes](https://data.cityofchicago.org/Transportation/CTA-Bus-Routes-kml/rytz-fq6y): Line data representing CTA Bus Routes. Source data are NAVTEQ street centerlines.
+
+# Import CSV into R
+
+To import a CSV file into R, from the City of Chicago Open Data Portal, you’ll do the following:
+
+1. Click the `Download` Button on the top-right of the webpage.
+
+2. Hover your mouse on `CSV`, right-click, and click on the `Copy Link Address` button.
+
+<img src='https://github.com/cenuno/cenuno.github.io/raw/master/Mapping_CTA_files/figure-html/Import_CSV_into_R.png' style='margin:0px auto; display:block; width: 100%' class='center'<image/>
+*Image couresy of City of Chicago*
+
+3. Store the link as a character vector to be used in `file` argument inside the `read.csv()` function, while setting `header` equal to TRUE and `stringsAsFactors` equal to FALSE.
+
+```{r Import CTA L Info, eval = FALSE}
+# List of L stops
+ctaLinfo <- read.csv( file = "https://data.cityofchicago.org/api/views/8pix-ypme/rows.csv?accessType=DOWNLOAD"
+                      , header = TRUE
+                      , stringsAsFactors = FALSE
+                      )
+```
+
+# Welcome to KMZ
+
+KMZ files are [zipped KML (Keyhole Markup Language)](https://developers.google.com/kml/documentation/kmzarchives?csw=1) files with a .kmz extension. The contents of a KMZ file are a single root KML document, which is commonly expressed as “doc.kml”. The line and point data regarding CTA ‘L’ trains and buses is stored as a KMZ, requiring us to unzip the file prior to using the KML file inside.
+
+## Import KMZ into R
+To import a KMZ file into R, from the City of Chicago Open Data Portal, you’ll do the following:
+
+1. Hover your mouse on `Download`, right-click, and click on the `Copy the Link Address` button.
+
+<img src='https://github.com/cenuno/cenuno.github.io/raw/master/Mapping_CTA_files/figure-html/Import_KML_Into_R.png' style='margin:0px auto; display:block; width: 100%' class='center'<image/>
+*Image couresy of City of Chicago*
+
+2. Paste the link into the `url` argument inside the `download.file()` function. Be sure to name the zip file with the `destfile` argument. You’ll reuse that exact same character string when unzipping the file. However, you’ll always be extracting the `“doc.kml”` file that resides inside the unzipped KMZ file.
+
+## Working Directory Matters
+
+I'll be downloading the zip file into my current working directory. If you'd like to place it elsewhere, please use the `setwd()` function to declare your preferred working directory to store the downloaded files.
+
+```{r Download KMZ Files, eval = FALSE}
+# optional
+# setwd( dir = "/your/preferred/wd/filepath")
+library( sp )
+library( rgdal )
+
+###############################
+# download CTA 'L' Rail Lines #
+###############################
+download.file( url = "https://data.cityofchicago.org/download/sgbp-qafc/application%2Fzip"
+               , destfile = "CTA_RailLines.zip"
+               )
+# unzip file
+unzip( "CTA_RailLines.zip")
+
+# read data
+ctaLines <- readOGR( dsn = paste( getwd()
+                                  , "doc.kml"
+                                  , sep = "/"
+                                  )
+                , stringsAsFactors = FALSE
+                )
+##################################
+# download CTA 'L' Rail Stations #
+##################################
+download.file( url = "https://data.cityofchicago.org/download/4qtv-9w43/application%2Fzip"
+               , destfile = "CTA_RailStations.zip"
+               )
+# unzip file
+unzip( "CTA_RailStations.zip")
+
+# read data
+ctaLineStations <- readOGR( dsn = paste( getwd()
+                                  , "doc.kml"
+                                  , sep = "/"
+                                  )
+                , stringsAsFactors = FALSE
+                )
+###############################
+# download CTA Bus Routes #####
+###############################
+download.file( url = "https://data.cityofchicago.org/download/rytz-fq6y/application%2Fzip"
+               , destfile = "CTA_ROUTES.zip"
+               )
+
+# unzip file
+unzip( "CTA_ROUTES.zip")
+
+# read data
+ctaBusRoutes <- readOGR( dsn = paste( getwd()
+                                  , "doc.kml"
+                                  , sep = "/"
+                                  )
+                , stringsAsFactors = FALSE
+                )
+###############################
+# download CTA Bus Stops ######
+###############################
+download.file( url = "https://data.cityofchicago.org/download/84eu-buny/application%2Fzip"
+               , destfile = "CTA_BusStops.zip")
+
+# unzip file
+unzip( "CTA_BusStops.zip" )
+
+# read data
+ctaBusStations <- readOGR( dsn = paste( getwd()
+                                  , "doc.kml"
+                                  , sep = "/"
+                                  )
+                , stringsAsFactors = FALSE
+                )
+
+########################################
+# Import Community Areas as Background #
+########################################
+# store Chicago current community area
+# GeoJSON URL as a character vector
+geojson_comarea_url <- "https://data.cityofchicago.org/api/geospatial/cauq-8yn6?method=export&format=GeoJSON"
+
+# transform URL character vector into spatial dataframe
+comarea606 <- readOGR( dsn = geojson_comarea_url
+                       , layer = "OGRGeoJSON"
+                       , stringsAsFactors = FALSE
+                       , verbose = FALSE # to hide progress message after object is created
+)
+
+```
+
+# Plotting Functions
+
+Plotting the CTA requires the use of four functions, in order of appearance:
+
+* [`pdf`](https://www.rdocumentation.org/packages/grDevices/versions/3.4.3/topics/pdf): pdf starts the graphics device driver for producing PDF graphics.
+
+* [`par`](https://www.rdocumentation.org/packages/graphics/versions/3.4.3/topics/par): used to minimize the white space on the plot, as well as declaring a dark background color.
+
+* [`plot`](https://www.rdocumentation.org/packages/graphics/versions/3.4.3/topics/plot): used to display the [spatial polygons data frame](https://www.rdocumentation.org/packages/sp/versions/1.2-5/topics/SpatialPolygonsDataFrame-class). This script “hides” the borders of the City of Chicago Community Areas by filling the polygons with the same color as the borders.
+
+* [`lines`](https://stat.ethz.ch/R-manual/R-devel/library/graphics/html/lines.html): used to display the [spatial lines data frame](https://www.rdocumentation.org/packages/sp/versions/1.2-6/topics/SpatialLines-class) of the CTA ‘L’ rail lines.
+
+* [`points`](https://stat.ethz.ch/R-manual/R-devel/library/graphics/html/points.html): used to display the [spatial points data frame](https://www.rdocumentation.org/packages/sp/versions/1.2-6/topics/SpatialPoints-class) of the CTA ‘L’ rail line stations.
+
+* [`dev.off`](https://www.rdocumentation.org/packages/grDevices/versions/3.4.3/topics/dev): shuts down the specified (by default the current) device. 
+
+# Plot CTA Train Routes
+
+<img src='https://github.com/cenuno/cenuno.github.io/raw/master/Mapping_CTA_files/figure-html/CTA_L_RailLines_Stations_2017-08-19.png' style='margin:0px auto; display:block; width: 80%' class='center'<image/>
+
+```{r Viz L, eval = FALSE}
+# save as pdf
+pdf( file = "CTA_L_RailLines_Stations_2017-08-19.pdf"
+     , width = 8
+     , height = 11
+     )
+# clear margin white space
+par( mar = c(0, 0, 4, 0 )
+     , bg = "#000000"
+     )
+# plot community areas
+plot( comarea606
+      #, main = "City of Chicago 77 Community Areas"
+      , col = "#B3DDF2"
+      , border = "#B3DDF2"
+      )
+
+# add Blue Line
+lines( ctaLines[ ctaLines$Name == "Blue Line (Forest Park)" |
+                   ctaLines$Name == "Blue Line (O'Hare)"
+                 , ]
+       , col = "#00A1DE"
+       , lwd = 10 # make line thicker
+       )
+
+# plot Red Line
+lines( ctaLines[ ctaLines$Name == "Red, Purple Line" |
+                   ctaLines$Name == "Brown, Purple (Express), Red" |
+                   ctaLines$Name == "Red Line"
+                 , ]
+       , col = "#C60C30"
+       , lwd = 10
+       )
+# plot Green Line
+lines( ctaLines[ ctaLines$Name == "Green, Pink" |
+                   ctaLines$Name == "Green Line" |
+                   ctaLines$Name == "Green, Orange" |
+                   ctaLines$Name == "Brown, Green, Orange, Pink, Purple (Exp)"
+                 , ]
+       , col = "#009B3A"
+       , lwd = 8
+       )
+# plot Yellow Line
+lines( ctaLines[ ctaLines$Name == "Yellow Line"
+                 , ]
+       , col = "#F9E300"
+       , lwd = 10
+       )
+# plot Purple Line
+lines( ctaLines[ ctaLines$Name == "Red, Purple Line" |
+                   ctaLines$Name == "Brown, Purple (Express), Red" |
+                   ctaLines$Name == "Brown, Green, Orange, Pink, Purple (Exp)" |
+                   ctaLines$Name == "Purple Line" |
+                   ctaLines$Name == "Brown, Purple" |
+                   ctaLines$Name == "Brown, Orange, Pink, Purple (Express)"
+                 , ]
+       , col = "#522398"
+       , lwd = 10
+       )
+# plot Orange Line
+lines( ctaLines[ ctaLines$Name == "Brown, Green, Orange, Pink, Purple (Exp)" |
+                   ctaLines$Name == "Brown, Orange, Pink, Purple (Express)" |
+                   ctaLines$Name == "Green, Orange" |
+                   ctaLines$Name == "Orange Line"
+                   , ]
+       , col = "#F9461C"
+       , lwd = 10
+       )
+# plot Brown Line
+lines( ctaLines[ ctaLines$Name == "Brown, Purple (Express), Red" |
+                   ctaLines$Name == "Brown, Green, Orange, Pink, Purple (Exp)" |
+                   ctaLines$Name == "Brown, Purple" |
+                   ctaLines$Name == "Brown, Orange, Pink, Purple (Express)" |
+                   ctaLines$Name == "Brown Line"
+                 , ]
+       , col = "#62361B"
+       , lwd = 10
+       )
+# plot Pink Line
+lines( ctaLines[ ctaLines$Name == "Brown, Green, Orange, Pink, Purple (Exp)" |
+                   ctaLines$Name == "Brown, Orange, Pink, Purple (Express)" |
+                   ctaLines$Name == "Green, Pink" |
+                   ctaLines$Name == "Pink Line"
+                   , ]
+       , col = "#E27EA6"
+       , lwd = 10
+       )
+# add CTA 'L' Station points
+points( ctaLineStations
+        , col = "#FFFFFF"
+        , pch = 20
+        , cex = 1
+        )
+# shut down graphing device
+dev.off()
+```
+
+# Plot CTA Bus Routes
+
+<img src='https://github.com/cenuno/cenuno.github.io/raw/master/Mapping_CTA_files/figure-html/CTA_Bus_Routes_Stops_2017-08-19.png' style='margin:0px auto; display:block; width: 80%' class='center'<image/>
+
+```{r Viz Bus, eval = FALSE}
+# save as PDF
+pdf( file = "CTA_Bus_Routes_Stops_2017-08-19.pdf"
+     , width = 9
+     , height = 12
+     )
+# clear margin white space
+par( mar = c(0, 0, 4, 0 )
+     , bg = "#000000"
+     )
+# plot community areas
+plot( comarea606
+      #, main = "City of Chicago 77 Community Areas"
+      , col = "#B3DDF2"
+      , border = "#B3DDF2"
+      )
+# add CTA Bus Routes
+lines( ctaBusRoutes
+       , col = "#FFFFFF"
+       , lwd = 4
+       )
+# add CTA Bus Stops
+points( ctaBusStations
+        , col = "#FF0000"
+        , pch = 20
+        , cex = 0.6
+        )
+# turn graphic device off
+dev.off()
+```
+
+# About Me
+
+Thank you for reading this tutorial. My name is Cristian E. Nuno and I am an aspiring data scientist. To see more of my work, please visit my professional portfolio [*Urban Data Science*](https://cenuno.github.io/).
+
+## Session Info
+
+```{r Session Info}
+# Print version information about R, the OS and attached or loaded packages.
+sessionInfo()
+```

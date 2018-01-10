@@ -14,11 +14,11 @@ navbar:
       href: choropleth_map.html
     - text: Highlight Points Inside a Certain Radius
       href: distance_coord_pairs.html
+    - text: Mapping Public Transportation in Chicago
+      href: Mapping_CTA.html
   - text: About
-    icon: fa-info fa-lg
     href: about.html
   - text: Disclaimer
-    icon: fa-file-text fa-lg
     href: disclaimer.html
   right:
   - icon: fa-github fa-lg

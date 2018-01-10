@@ -45,11 +45,16 @@ Since the summer of 2017, I currently work as a [Project Associate](https://urba
 
 As one of the smaller labs, my position allows me to take on a wide-range of responsibilites. A few them are as follows:
 
+* Import, clean, and transform data sets from multiple sources in order to understand and answer research questions using R.
+
+* Coordinate with diverse set of senior stakeholders on requirements, roles, responsibilities, and project timelines.
+
+* Map, plot, and create interactive visualizations for descriptive statistics.
+
+* Train inexperienced programmers how to use R.
+
+* Use version control for overseeing the entire analytical development lifecycle of our research projects. 
+
+* Conduct quality assurance checks for both R and Python scripts.
+
 * Identify equivalent individuals, using both deterministic and probabilistic record linkage methods, in administrative datasets using R. 
-* Visualize descriptive statistics, not limited to but including choropleth maps, small multiple plots, and grouped bar charts, using R.
-* Train two undergraduate interns to use version control on their joint interactive visualization project, using the Shiny and Leaflet R packages.
-* Train qualitatively-strong coworkers to use R, RStudio, and RMarkdown to both produce internal reports and export crosstabs as CSV files.
-
-
-
-

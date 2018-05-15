@@ -45,16 +45,19 @@ Since the summer of 2017, I currently work as a [Project Associate](https://urba
 
 As one of the smaller labs, my position allows me to take on a wide-range of responsibilites. A few them are as follows:
 
-* Import, clean, and transform data sets from multiple sources in order to understand and answer research questions using R.
+- Translate research questions from principal investigators, research managers, and clients into a technical design to develop project requirements and extract, transform, and load (ETL) specifications. 
 
-* Coordinate with diverse set of senior stakeholders on requirements, roles, responsibilities, and project timelines.
+- Produce static and interactive visualizations that showcase the stories embedded within the clients data.
 
-* Map, plot, and create interactive visualizations for descriptive statistics.
+- Configure and maintain source code repositories using Git.
 
-* Train inexperienced programmers how to use R.
+- Use branching to create, test, and push new features to master branch.
 
-* Use version control for overseeing the entire analytical development lifecycle of our research projects. 
+- Identify equivalent individuals, using both deterministic and probabilistic record linkage methods, in administrative datasets using R.
 
-* Conduct quality assurance checks for both R and Python scripts.
+- [Developing a Shiny app with colleague](https://github.com/Poverty-Lab/ACS-Map-Dashboard) that aggregates census tract information up to the Chicago community area level. 
 
-* Identify equivalent individuals, using both deterministic and probabilistic record linkage methods, in administrative datasets using R. 
+-	Rely on passion for self-learning to teach myself new packages, methods, and tools needed to answer research questions.
+
+-	Constantly seeking feedback to improve my ability to communicate technical insights to both technical and non-technical team members.
+

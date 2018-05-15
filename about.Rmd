@@ -27,7 +27,7 @@ I studied urban planning and economics at the [University of Illinois at Chicago
 
 The emphasis on the individual was eloquently expressed through the writings of [Mike Royko](http://www.press.uchicago.edu/Misc/Chicago/730719.html) and [Studs Terkel](https://www.youtube.com/watch?v=Oyl1BvHo9LM). I learned of great Chicago leaders such as [Jane Addams](http://www.hullhousemuseum.org/), [Harold Washington](https://www.thisamericanlife.org/radio-archives/episode/84/harold), and [Florence Scala](http://www.encyclopedia.chicagohistory.org/pages/410114.html).
 
-Despite my qualitative background, I decided to go onto to graduate school to strengthen my technical skills. 
+Despite my qualitative background, I decided to go onto to graduate school to grow my programming and quanitative reasoning skills. 
 
 ## Graduate School
 
@@ -47,7 +47,7 @@ As one of the smaller labs, my position allows me to take on a wide-range of res
 
 - Translate research questions from principal investigators, research managers, and clients into a technical design to develop project requirements and extract, transform, and load (ETL) specifications. 
 
-- Produce static and interactive visualizations that showcase the stories embedded within the clients data.
+- Produce static and interactive visualizations that showcase the stories embedded within the clients’ data.
 
 - Configure and maintain source code repositories using Git.
 

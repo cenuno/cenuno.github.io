@@ -413,9 +413,27 @@ comarea606 &lt;- readOGR( dsn = geojson_comarea_url
                        , layer = &quot;OGRGeoJSON&quot;
                        , stringsAsFactors = FALSE
                        , verbose = FALSE
-)
+)</code></pre>
+<pre><code>## Warning in normalizePath(dsn): path[1]=&quot;https://data.cityofchicago.org/
+## api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON&quot;: No such file or
+## directory
 
-# import cps school data for SY1617
+## Warning in normalizePath(dsn): path[1]=&quot;https://data.cityofchicago.org/
+## api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON&quot;: No such file or
+## directory
+
+## Warning in normalizePath(dsn): path[1]=&quot;https://data.cityofchicago.org/
+## api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON&quot;: No such file or
+## directory
+
+## Warning in normalizePath(dsn): path[1]=&quot;https://data.cityofchicago.org/
+## api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON&quot;: No such file or
+## directory
+
+## Warning in normalizePath(dsn): path[1]=&quot;https://data.cityofchicago.org/
+## api/geospatial/cauq-8yn6?method=export&amp;format=GeoJSON&quot;: No such file or
+## directory</code></pre>
+<pre class="r"><code># import cps school data for SY1617
 cps.sy1617.url &lt;- &quot;https://data.cityofchicago.org/api/views/8i6r-et8s/rows.csv?accessType=DOWNLOAD&quot;
 
 # transform URL into a data frame using the base `read.csv` function
@@ -735,7 +753,7 @@ sessionInfo()</code></pre>
 </div>
 
 <br>
-<span style="color:#CCCCCC">Copyright &copy; 2017 - 2018. Urban Data Science. Email me at <a href='mailto:nuno.e.cristian@gmail.com'>nuno DOT e DOT cristian AT gmail DOT com</a>. All rights reserved. See Disclaimer for further details.</span>
+<span style="color:#CCCCCC">Copyright &copy; 2017 - 2018. Urban Data Science. All rights reserved. See Disclaimer for further details.</span>
 
 
 </div>
